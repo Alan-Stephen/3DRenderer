@@ -153,7 +153,6 @@ Model::Model(std::string filename, glm::mat4 model, glm::vec3 scale, glm::vec3 t
 	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> norms;
 
-	std::vector<Vertex> verticies;
 	bool parsing_faces = false;
 
 	unsigned int curr_material_ref = -1;
@@ -206,6 +205,7 @@ Model::Model(std::string filename, glm::mat4 model, glm::vec3 scale, glm::vec3 t
 				assert(curr_material_ref != -1);
 				std::cout << "created mesh with mtl : " << tokens.at(1) << std::endl;
 				_meshes.emplace_back(current_verticies, curr_material_ref);
+				current_verticies.clear();
 			}
 
 			// create new object with material retrieved from hashmap using name as key
@@ -215,10 +215,13 @@ Model::Model(std::string filename, glm::mat4 model, glm::vec3 scale, glm::vec3 t
 		else if (line_type == "f") {
 			// if more than 3 faces, triangulating using by taking strips, note this only works for convex, non-complex polygons
 			// start index at 3 as index 0 contains 'f'
+			Vertex v1 = m_create_vertex_from_indicies(tokens.at(1), vecs, uvs, norms);
+			Vertex v3 = m_create_vertex_from_indicies(tokens.at(2), vecs, uvs, norms);
+			Vertex v2 = v3;
 			for (int i = 3; i < tokens.size(); i++) {
-				Vertex v1 = m_create_vertex_from_indicies(tokens.at(1), vecs, uvs, norms);
-				Vertex v2 = m_create_vertex_from_indicies(tokens.at(i - 1), vecs, uvs, norms);
-				Vertex v3 = m_create_vertex_from_indicies(tokens.at(i), vecs, uvs, norms);
+				v2 = v3;
+				v3 = m_create_vertex_from_indicies(tokens.at(i), vecs, uvs, norms);
+
 				current_verticies.push_back(v1);
 				current_verticies.push_back(v2);
 				current_verticies.push_back(v3);

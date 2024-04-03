@@ -71,5 +71,8 @@ GLuint Shader::compileShader(const char* vsFilename, const char* fsFilename) con
 	glDeleteShader(fragmentShader);
 
 
+	free(vertexShaderSource);
+	free(fragmentShaderSource);
+
 	return program;
 }
