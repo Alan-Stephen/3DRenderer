@@ -54,7 +54,8 @@ int main(int argc, char** argv)
 	std::cout << "COMPILED SHADERS\n";
 
 	std::cout << "PARSING OBJECTS\n";
-	Model p_model = Model("objs/doughnut2/doughnut2.obj");
+	Model p_model = Model("objs/doughnut2/doughnut2.obj", glm::mat4(1.0f), glm::vec3(100000.f,10000.f,10000.f), glm::vec3(00.f, 00.f, 00.f));
+	Model model = Model("objs/white_oak/white_oak.obj", glm::mat4(1.0f), glm::vec3(.001f,0.001f,0.001f), glm::vec3(100.f, 100.f, 100.f));
 	std::cout << "FINISHED PARSING\n";
 
 
@@ -76,8 +77,8 @@ int main(int argc, char** argv)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-		glUniformMatrix4fv(shader.getUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(p_model.get_model()));	
 		p_model.draw(shader);
+		model.draw(shader);
 
 		glBindVertexArray(0);
 

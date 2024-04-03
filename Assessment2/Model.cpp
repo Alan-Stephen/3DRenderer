@@ -11,6 +11,7 @@
 #include <vector>
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include <glm/gtc/type_ptr.hpp>
 
 void m_remove_tabs(std::string& str) {
     size_t pos;
@@ -32,13 +33,14 @@ std::vector<std::string> m_split(std::string s, std::string delim) {
         token = s.substr(start, end - start);
 		m_remove_tabs(token);
         start = end + len;
-		if (token == "" or token.size() == 0) {
-			continue;
+		if (!token.empty()) {
+			res.push_back(token);
 		}
-        res.push_back(token);
     }
 
-    res.push_back(s.substr (start));
+	if (!s.substr(start).empty()) {
+		res.push_back(s.substr (start));
+	}
     return res;
 }
 
@@ -62,6 +64,9 @@ int m_mtl_parse(char* filename, std::vector<Material> &mtls)
 	bool currently_parsing = false;
 	for (std::string line; std::getline(infile, line);) {
 		std::vector<std::string> tokens = m_split(line, " ");
+
+		if (tokens.size() == 0)
+			continue;
 
 		if (tokens.at(0) == "newmtl") {
 			// fail if token size is less than 2
@@ -138,9 +143,10 @@ Vertex m_create_vertex_from_indicies(const std::string &indicies, const std::vec
 
 	return Vertex(vec,tex, norm);
 }
-Model::Model(std::string filename)
+Model::Model(std::string filename, glm::mat4 model, glm::vec3 scale, glm::vec3 translate)
 {
-	_model = glm::scale(_model, glm::vec3(10.0,10,10.0));
+	_model = glm::scale(model, scale);
+	_model = glm::translate(model, translate);
 	std::unordered_map<std::string, int> name_to_index;
 
 	std::vector<glm::vec3> vecs;
@@ -167,9 +173,12 @@ Model::Model(std::string filename)
 	for (std::string line; std::getline(infile, line);) 
 	{
 		// make list of tokens form line splitting using space
-		std::vector<std::string> tokens = m_split(line, " ");
+		const std::vector<std::string> tokens = m_split(line, " ");
 		// get first token in line, this is the type of information stored in the line
-		std::string &line_type = tokens.at(0);
+		if (tokens.size() == 0) {
+			continue;
+		}
+		const std::string &line_type = tokens.at(0);
 
 		if (line_type == "mtllib") {
 			// mtl_string is a path to the mtl file
@@ -237,6 +246,8 @@ Model::~Model()
 
 void Model::draw(const Shader& shader)
 {
+
+	glUniformMatrix4fv(shader.getUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(_model));	
 	for (const Mesh& mesh : _meshes) {
 		_materials.at(mesh.get_material_ref()).bind();
 		mesh.draw();
