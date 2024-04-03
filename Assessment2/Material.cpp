@@ -16,6 +16,7 @@ void Material::deinit()
 void Material::bind() const
 {
 	_diffuse.bind(0);
+	_specular.bind(1);
 }
 
 std::string Material::get_name() const

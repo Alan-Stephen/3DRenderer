@@ -98,4 +98,8 @@ void Camera::handleInput(GLFWwindow* window)
 		_firstClick = true;
 	}
 
-} 
+}
+glm::vec3 Camera::get_pos() const
+{
+	return _position;
+}

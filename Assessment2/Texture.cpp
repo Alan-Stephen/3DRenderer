@@ -65,10 +65,14 @@ GLuint CreateTexture(const char* filename, int &height, int &width, bool is_flat
 			printf("Loaded image with path : [%s]\n", filename);
 		}
 		
-		if (channels == 4)
+		if (channels == 4) {
+			std::cout << "Texture had 4 channels\n";
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pxls);
-		if (channels == 3)
+		}
+		if (channels == 3) {
+			std::cout << "Texture had 3 channels\n";
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, pxls);
+		}
 	}
 	else
 	{

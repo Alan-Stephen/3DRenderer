@@ -55,9 +55,12 @@ int main(int argc, char** argv)
 	std::cout << "COMPILED SHADERS\n";
 
 	std::cout << "PARSING OBJECTS\n";
-	Model p_model = Model("objs/doughnut2/doughnut2.obj", glm::mat4(1.0f), glm::vec3(10.f, 10.f, 10.f), glm::vec3(00.f, 00.f, 00.f));
+	//Model p_model = Model("objs/doughnut2/doughnut2.obj", glm::mat4(1.0f), glm::vec3(10.f, 10.f, 10.f), glm::vec3(00.f, 00.f, 00.f));
 	Model model = Model("objs/white_oak/white_oak.obj", glm::mat4(1.0f), glm::vec3(.01f, 0.01f, 0.01f), glm::vec3(100.f, 100.f, 100.f));
 	std::cout << "FINISHED PARSING\n";
+
+	glm::vec3 light_pos = glm::vec3(100.f, -100.f, 100.f);
+	glm::vec4 light_col = glm::vec4(1.f, 1.f, 1.f, 1.f);
 
 
 	glEnable(GL_DEPTH_TEST);
@@ -67,6 +70,9 @@ int main(int argc, char** argv)
 
 	shader.bind();
 
+	glUniform3fv(shader.getUniformLocation("light_pos"), 1, glm::value_ptr(light_pos));
+	glUniform4fv(shader.getUniformLocation("light_col"), 1, glm::value_ptr(light_col));
+
 	Camera camera = Camera(width, height, glm::vec3(0.0, 0.0, 0.0));
 	while (!glfwWindowShouldClose(window))
 	{
@@ -74,11 +80,12 @@ int main(int argc, char** argv)
 		camera.handleInput(window);
 		camera.bind(45, 0.01f, 1000.f, shader, "cameraMat");
 
-		glClearColor(1.f, 1.f, 1.f, 1.f);
+		glClearColor(0.f, 0.f, 0.f, 0.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-		p_model.draw(shader);
+		glUniform3fv(shader.getUniformLocation("cam_pos"), 1, glm::value_ptr(camera.get_pos()));
+		//p_model.draw(shader);
 		model.draw(shader);
 
 		glBindVertexArray(0);

@@ -30,5 +30,6 @@ public:
 
 	void bind(float fov, float nearPlane, float farPlane, Shader& shader, std::string uniform);
 	void handleInput(GLFWwindow* window);
+	glm::vec3 get_pos() const;
 };
 
