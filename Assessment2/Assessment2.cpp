@@ -54,7 +54,7 @@ int main(int argc, char** argv)
 	std::cout << "COMPILED SHADERS\n";
 
 	std::cout << "PARSING OBJECTS\n";
-	Model p_model = Model("objs/white_oak/white_oak.obj");
+	Model p_model = Model("objs/doughnut2/doughnut2.obj");
 	std::cout << "FINISHED PARSING\n";
 
 

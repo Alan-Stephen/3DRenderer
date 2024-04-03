@@ -10,6 +10,7 @@
 #include "Material.h"
 #include <vector>
 #include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 void m_remove_tabs(std::string& str) {
     size_t pos;
@@ -22,7 +23,7 @@ void m_remove_tabs(std::string& str) {
 // splits a string into a vector of strings (tokens) based on a delimiter
 std::vector<std::string> m_split(std::string s, std::string delim) {
     size_t start = 0; 
-	size_t end; 
+	size_t end;
 	size_t len = delim.length();
     std::string token;
     std::vector<std::string> res;
@@ -31,7 +32,7 @@ std::vector<std::string> m_split(std::string s, std::string delim) {
         token = s.substr(start, end - start);
 		m_remove_tabs(token);
         start = end + len;
-		if (token == "") {
+		if (token == "" or token.size() == 0) {
 			continue;
 		}
         res.push_back(token);
@@ -139,6 +140,7 @@ Vertex m_create_vertex_from_indicies(const std::string &indicies, const std::vec
 }
 Model::Model(std::string filename)
 {
+	_model = glm::scale(_model, glm::vec3(10.0,10,10.0));
 	std::unordered_map<std::string, int> name_to_index;
 
 	std::vector<glm::vec3> vecs;
@@ -202,13 +204,16 @@ Model::Model(std::string filename)
 			parsing_faces = true;
 		}
 		else if (line_type == "f") {
-			Vertex v1 = m_create_vertex_from_indicies(tokens.at(1), vecs, uvs, norms);
-			Vertex v2 = m_create_vertex_from_indicies(tokens.at(2), vecs, uvs, norms);
-			Vertex v3 = m_create_vertex_from_indicies(tokens.at(3), vecs, uvs, norms);
-			
-			current_verticies.push_back(v1);
-			current_verticies.push_back(v2);
-			current_verticies.push_back(v3);
+			// if more than 3 faces, triangulating using by taking strips, note this only works for convex, non-complex polygons
+			// start index at 3 as index 0 contains 'f'
+			for (int i = 3; i < tokens.size(); i++) {
+				Vertex v1 = m_create_vertex_from_indicies(tokens.at(1), vecs, uvs, norms);
+				Vertex v2 = m_create_vertex_from_indicies(tokens.at(i - 1), vecs, uvs, norms);
+				Vertex v3 = m_create_vertex_from_indicies(tokens.at(i), vecs, uvs, norms);
+				current_verticies.push_back(v1);
+				current_verticies.push_back(v2);
+				current_verticies.push_back(v3);
+			}
 		}
 	}
 
