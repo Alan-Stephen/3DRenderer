@@ -5,6 +5,9 @@
 #include "glm/glm.hpp"
 
 struct Vertex {
+	Vertex(glm::vec3 position, glm::vec2 tex, glm::vec3 normal) : 
+		position(position), normal(normal), tex(tex)
+	{}
 	glm::vec3 position;
 	glm::vec3 normal;
 	glm::vec2 tex;
@@ -19,7 +22,8 @@ private:
 	unsigned int _material_ref;
 public:
 	Mesh(const std::vector<Vertex> &verts, unsigned int material_ref);
-	~Mesh();
-	void draw(const Shader& shader);
+	void deinit();
+	void draw() const;
+	unsigned int get_material_ref() const;
 };
 

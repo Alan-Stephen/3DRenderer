@@ -57,7 +57,13 @@ GLuint CreateTexture(const char* filename, int &height, int &width, bool is_flat
 
 	if (pxls != NULL)
 	{
-		printf("Loaded %s\n", filename);
+		if (is_flat) {
+			std::cout << "loaded flat colour" << std::endl;
+		}
+		else {
+			printf("Loaded image with path : [%s]\n", filename);
+		}
+		
 		if (channels == 4)
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pxls);
 		if (channels == 3)
@@ -65,7 +71,7 @@ GLuint CreateTexture(const char* filename, int &height, int &width, bool is_flat
 	}
 	else
 	{
-		printf("Failed to load %s\n", filename);
+		printf("Failed to load image with path : [%s]\n", filename);
 	}
 
 	glGenerateMipmap(GL_TEXTURE_2D);

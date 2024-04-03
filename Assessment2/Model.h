@@ -18,5 +18,6 @@ private:
 public:
 	Model(std::string filename);
 	~Model();
+	void draw(const Shader &shader);
 };
 

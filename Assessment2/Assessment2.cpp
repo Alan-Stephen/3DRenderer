@@ -17,6 +17,7 @@
 
 #include "VertexBuffer.h"
 #include "Camera.h"
+#include "Model.h"
 
 
 const int width = 1200;
@@ -59,13 +60,15 @@ int main(int argc, char** argv)
 	Test2 T2;
 	Test* tester = &T2;
 	std::cout << "PARSING OBJECTS\n";
-	std::vector<OldObject> objs = tester->ParseObj();
+	//std::vector<OldObject> objs = tester->ParseObj();
+	Model p_model = Model("objs/doughnut2/doughnut2.obj");
 	std::cout << "FINISHED PARSING\n";
 	//SECTION A - EDIT THIS CODE TO TEST
 
 
 
 	//SECTION B - SETTING UP TEXTURE AND VAO FOR EACH OBJECT. DO NOT EDIT THIS CODE 
+	/*
 	for (int i = 0; i < objs.size(); i++)
 	{
 		std::cout << "SETTING UP OBJECT : " << i << " \n";
@@ -93,6 +96,7 @@ int main(int argc, char** argv)
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 		glEnableVertexAttribArray(1);
 	}
+	*/
 	//SECTION B - SETTING UP TEXTURE AND VAO FOR EACH OBJECT. DO NOT EDIT THIS CODE 
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -121,6 +125,8 @@ int main(int argc, char** argv)
 		glm::mat4 model = glm::mat4(1.f);
 		tester->Model(&model);
 		glUniformMatrix4fv(shader.getUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));		//SECTION C - TEXTURE BINDING, MODEL MATRIX AND DRAW CALL FOR EACH OBJECT. DO NOT EDIT THIS CODE 
+		p_model.draw(shader);
+		/*
 		for (int i = 0; i < objs.size(); i++)
 		{
 			glBindVertexArray(objs[i].VAO);
@@ -128,6 +134,7 @@ int main(int argc, char** argv)
 			
 			glDrawArrays(GL_TRIANGLES, 0, (objs[i].tris.size() * 3));
 		}
+		*/
 
 		glBindVertexArray(0);
 

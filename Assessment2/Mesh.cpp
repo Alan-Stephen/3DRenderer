@@ -1,6 +1,7 @@
 #include "Mesh.h"
 #include "Model.h"
 #include "Shader.h"
+#include <iostream>
 
 Mesh::Mesh(const std::vector<Vertex> &verts, unsigned int material_ref) :
 	_verts(verts), _material_ref(material_ref)
@@ -19,15 +20,22 @@ Mesh::Mesh(const std::vector<Vertex> &verts, unsigned int material_ref) :
 		glEnableVertexAttribArray(2);
 }
 
-Mesh::~Mesh()
+void Mesh::deinit()
 {
+	std::cout << "DECONSTRUCTING MESH " << _vao << std::endl;
 	glDeleteVertexArrays(1, &_vao);
 	glDeleteBuffers(1, &_vbo);
+
 }
 
-void Mesh::draw(const Shader& shader)
+void Mesh::draw() const
 {
 	glBindVertexArray(_vao);
 	
 	glDrawArrays(GL_TRIANGLES, 0, _verts.size());
+}
+
+unsigned int Mesh::get_material_ref() const
+{
+	return _material_ref;
 }
