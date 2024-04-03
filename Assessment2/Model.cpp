@@ -22,25 +22,36 @@ void m_remove_tabs(std::string& str) {
 
 
 // splits a string into a vector of strings (tokens) based on a delimiter
-std::vector<std::string> m_split(std::string s, std::string delim) {
-    size_t start = 0; 
-	size_t end;
-	size_t len = delim.length();
-    std::string token;
+std::vector<std::string> m_split(const std::string &s, const char *delim) {
     std::vector<std::string> res;
+    size_t start = 0;
+    size_t end = s.find(delim);
 
-    while ((end = s.find(delim, start)) != std::string::npos) {
-        token = s.substr(start, end - start);
-		m_remove_tabs(token);
-        start = end + len;
-		if (!token.empty()) {
-			res.push_back(token);
-		}
+    // Reserve space in the result vector to avoid reallocations
+    res.reserve(10); // A heuristic value, adjust as needed
+
+    while (end != std::string::npos) {
+        // Extract substring and remove tabs in place
+        std::string token = s.substr(start, end - start);
+        m_remove_tabs(token);
+
+        // Add token to result vector using move semantics
+        if (!token.empty()) {
+            res.push_back(std::move(token));
+        }
+
+        // Update start position for the next substring
+        start = end + strlen(delim);
+        end = s.find(delim, start);
     }
 
-	if (!s.substr(start).empty()) {
-		res.push_back(s.substr (start));
-	}
+    // Add the last token if there are characters remaining
+    std::string lastToken = s.substr(start);
+    m_remove_tabs(lastToken);
+    if (!lastToken.empty()) {
+        res.push_back(std::move(lastToken));
+    }
+
     return res;
 }
 
