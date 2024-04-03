@@ -193,6 +193,7 @@ Model::Model(std::string filename)
 			if (parsing_faces) {
 				// if accessing a new object put previous object into list of objects
 				assert(curr_material_ref != -1);
+				std::cout << "created mesh with mtl : " << tokens.at(1) << std::endl;
 				_meshes.emplace_back(current_verticies, curr_material_ref);
 			}
 
@@ -213,6 +214,8 @@ Model::Model(std::string filename)
 
 	// place the last object into the list of objects
 	assert(curr_material_ref != -1);
+
+	std::cout << "created mesh with mtl ref: " << curr_material_ref << std::endl;
 	_meshes.emplace_back(current_verticies, curr_material_ref);
 }
 
@@ -233,4 +236,9 @@ void Model::draw(const Shader& shader)
 		_materials.at(mesh.get_material_ref()).bind();
 		mesh.draw();
 	}
+}
+
+glm::mat4 Model::get_model() const
+{
+	return _model;
 }
