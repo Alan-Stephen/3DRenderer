@@ -9,6 +9,7 @@
 #include <iostream>
 #include <vector>
 
+#include <memory>
 #include "error.h"
 #include "texture.h"
 #include "Shader.h"
@@ -40,6 +41,25 @@ void processKeyboard(GLFWwindow* window)
 		glfwSetWindowShouldClose(window, true);
 }
 
+void render_scene(std::vector<std::unique_ptr<Model>> &models, Camera &camera, Shader &shader, GLFWwindow *window) 
+{
+		camera.bind(45, 0.01f, 1000.f, shader, "cameraMat");
+
+		glClearColor(0.f, 0.f, 0.f, 0.f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+		glUniform3fv(shader.get_uniform_location("cam_pos"), 1, glm::value_ptr(camera.get_pos()));
+
+		for(int i = 0; i < models.size(); i++) {
+			models.at(i).get()->draw(shader);
+		}
+
+		glBindVertexArray(0);
+
+		glfwSwapBuffers(window);
+
+}
 
 
 
@@ -57,11 +77,14 @@ int main(int argc, char** argv)
 	glDebugMessageCallback(DebguMessageCallback, 0);
 
 	Shader shader("textured.vert", "textured.frag");
+	Shader shadow_shader("shadow.vert", "shadow.frag");
 	std::cout << "COMPILED SHADERS\n";
 
 	std::cout << "PARSING OBJECTS\n";
-	Model p_model = Model("objs/floor/floor.obj", glm::mat4(1.0f), glm::vec3(128.0f, 1.f, 128.f), glm::vec3(00.f, 0.f, 00.f));
-	//Model model = Model("objs/white_oak/white_oak.obj", glm::mat4(1.0f), glm::vec3(.1f, 0.1f, 0.1f), glm::vec3(00.f, 00.f, 00.f));
+	std::vector<std::unique_ptr<Model>> models;
+
+	models.push_back(std::make_unique<Model>("objs/floor/floor.obj", glm::mat4(1.0f), glm::vec3(128.0f, 1.f, 128.f), glm::vec3(00.f, 0.f, 00.f)));
+	models.push_back(std::make_unique<Model>("objs/white_oak/white_oak.obj", glm::mat4(1.0f), glm::vec3(.1f, 0.1f, 0.1f), glm::vec3(00.f, 00.f, 00.f)));
 	std::cout << "FINISHED PARSING\n";
 
 	shader.bind();
@@ -99,20 +122,53 @@ int main(int argc, char** argv)
 
 	DirectionalLight directional_light = DirectionalLight(glm::vec3(.0f,1.0f,.0f),
 		glm::vec3(0.0f, 0.0f,0.0f),
-		glm::vec3(0.f, 0.0f,0.0f),
-		glm::vec3(0.f, 0.f,0.f));
+		glm::vec3(.8, 0.8,0.75),
+		glm::vec3(0.8f, 0.8f,0.75));
 
 	directional_light.bind(shader);
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
+
+	glEnable(GL_FRAMEBUFFER_SRGB);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
+	
+	// enable shadows
+
+	/*
+	unsigned int shadow_map_fbo;
+	glGenFramebuffers(1, &shadow_map_fbo);
+
+	unsigned int shadow_width = 2028;
+	unsigned int shadow_height = 2028;
+
+	unsigned int shadow_map;
+	glGenTextures(1, &shadow_map);
+	glBindTexture(GL_TEXTURE_2D, shadow_map);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, shadow_width, shadow_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+	float clampColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, clampColor);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, shadow_map_fbo);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadow_map, 0);
+
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	*/
+
 
 	Camera camera = Camera(width, height, glm::vec3(0.0, 0.0, 0.0));
+
 	double prev_time = 0.0;
 	double curr_time = 0.0;	
 	double diff;
@@ -136,19 +192,8 @@ int main(int argc, char** argv)
 
 		processKeyboard(window);
 		camera.handleInput(window);
-		camera.bind(45, 0.01f, 1000.f, shader, "cameraMat");
 
-		glClearColor(0.f, 0.f, 0.f, 0.f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-		glUniform3fv(shader.get_uniform_location("cam_pos"), 1, glm::value_ptr(camera.get_pos()));
-		p_model.draw(shader);
-		//model.draw(shader);
-
-		glBindVertexArray(0);
-
-		glfwSwapBuffers(window);
+		render_scene(models, camera, shader, window);
 
 		glfwPollEvents();
 

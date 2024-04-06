@@ -2,6 +2,8 @@
 #include "glm/glm.hpp"
 #include <string>
 #include "Texture.h"
+#include "Shader.h"
+#include "GL/gl3w.h"
 
 class Material {
 private:
@@ -13,6 +15,6 @@ private:
 public:
 	Material(const Texture &ambient, const Texture &specular, const Texture &diffuse, float shininess, const std::string &name);
 	void deinit();
-	void bind() const;
+	void bind(const Shader &shader) const;
 	std::string get_name() const;
 };

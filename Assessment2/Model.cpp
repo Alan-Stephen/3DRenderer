@@ -259,12 +259,12 @@ Model::~Model()
 	}
 }
 
-void Model::draw(const Shader& shader)
+void Model::draw(const Shader& shader) const
 {
 
 	glUniformMatrix4fv(shader.get_uniform_location("model"), 1, GL_FALSE, glm::value_ptr(_model));	
 	for (const Mesh& mesh : _meshes) {
-		_materials.at(mesh.get_material_ref()).bind();
+		_materials.at(mesh.get_material_ref()).bind(shader);
 		mesh.draw();
 	}
 }

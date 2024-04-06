@@ -19,7 +19,7 @@ private:
 public:
 	Model(std::string filename, glm::mat4 model, glm::vec3 scale, glm::vec3 translate);
 	~Model();
-	void draw(const Shader &shader);
+	void draw(const Shader &shader) const;
 	glm::mat4 get_model() const;
 };
 

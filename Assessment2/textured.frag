@@ -6,6 +6,7 @@ in vec3 pos;
 
 uniform sampler2D diffuse_tex;
 uniform sampler2D specular_tex;
+uniform float shininess;
 
 
 uniform vec3 cam_pos;
@@ -57,7 +58,7 @@ vec3 calculate_direct_light(DirectionalLight light, vec3 normal, vec3 view_direc
     float diff = max(dot(normal, lightDir), 0.0);
     // specular shading
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(view_direction, reflectDir), 0.0), 16);
+    float spec = pow(max(dot(view_direction, reflectDir), 0.0), shininess);
     // combine results
 
 	vec3 diffuse_res = vec3(texture(diffuse_tex, tex));
@@ -74,7 +75,7 @@ vec3 calculate_spot_light(SpotLight light, vec3 normal, vec3 frag_position, vec3
     float diff = max(dot(normal, lightDir), 0.0);
     // specular shading
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(view_direction, reflectDir), 0.0), 16); // 16 is shininess
+    float spec = pow(max(dot(view_direction, reflectDir), 0.0), shininess); // 16 is shininess
     // attenuation
     float distance    = length(light.position - frag_position);
 
@@ -97,7 +98,7 @@ vec3 calculate_point_light(PointLight light, vec3 normal, vec3 frag_position, ve
     float diff = max(dot(normal, lightDir), 0.0);
     // specular shading
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(view_direction, reflectDir), 0.0), 16); // 16 is shininess
+    float spec = pow(max(dot(view_direction, reflectDir), 0.0), shininess); // 16 is shininess
     // attenuation
     float distance    = length(light.position - frag_position);
     float attenuation = 1.0 / (light.constant + light.linear * distance + 
