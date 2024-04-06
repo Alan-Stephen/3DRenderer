@@ -1,0 +1,9 @@
+newmtl floor
+Ka 0.2 0.2 0.2  # Ambient color (RGB)
+Kd 1.0 1.0 1.0  # Diffuse color (RGB)
+Ks 0.5 0.5 0.5  # Specular color (RGB)
+Ns 100          # Shininess (0 to 1000)
+d 1.0           
+illum 2         
+map_Kd floor_diffuse.png
+map_Ks floor_norm.png

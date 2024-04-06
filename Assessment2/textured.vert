@@ -16,5 +16,5 @@ void main()
 	gl_Position = cameraMat * model * vec4(aPos, 1.f);
 	tex = aTex;
 	norm = aNorms;
-	pos = aPos;
+	pos = vec3(model * vec4(aPos, 1.0f));
 }

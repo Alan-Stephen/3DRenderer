@@ -147,7 +147,8 @@ void m_create_mappings(const std::vector<Material>& materials, std::unordered_ma
 // creates a vertex given face indicies e.g 1/1/1
 Vertex m_create_vertex_from_indicies(const std::string &indicies, const std::vector<glm::vec3> &vecs,const std::vector<glm::vec2> &uvs, const std::vector<glm::vec3> &norms) {
 	std::vector<std::string> tokens = m_split(indicies, "/");
-
+	
+	assert(tokens.size() >= 3);
 	glm::vec3 vec = vecs.at(std::stoi(tokens.at(0)) - 1);
 	glm::vec2 tex = uvs.at(std::stoi(tokens.at(1)) - 1);
 	glm::vec3 norm = norms.at(std::stoi(tokens.at(2)) - 1);
