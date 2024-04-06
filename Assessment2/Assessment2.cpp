@@ -66,16 +66,38 @@ int main(int argc, char** argv)
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glfwSwapInterval(0);
 
-
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
 	shader.bind();
 
 	glUniform3fv(shader.getUniformLocation("light_pos"), 1, glm::value_ptr(light_pos));
 	glUniform3fv(shader.getUniformLocation("light_col"), 1, glm::value_ptr(light_col));
 
 	Camera camera = Camera(width, height, glm::vec3(0.0, 0.0, 0.0));
+	double prev_time = 0.0;
+	double curr_time = 0.0;	
+	double diff;
+	unsigned int count = 0;
 	while (!glfwWindowShouldClose(window))
 	{
+
+		// calculate fps
+		curr_time = glfwGetTime();
+		diff = curr_time - prev_time;
+		count += 1;
+
+		if (diff >= (1.0 / 30.0)) {
+			std::string fps = std::to_string((1 / diff) * count);
+			std::string frame_time = std::to_string((diff / count) * 1000);
+			std::string title = fps + " / " + frame_time + " ms";
+			glfwSetWindowTitle(window, title.c_str());
+			prev_time = curr_time;
+			count = 0;
+		}
+
 		processKeyboard(window);
 		camera.handleInput(window);
 		camera.bind(45, 0.01f, 1000.f, shader, "cameraMat");
