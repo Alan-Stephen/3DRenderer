@@ -24,7 +24,7 @@ void Shader::bind()
 	glUseProgram(_id);
 }
 
-int Shader::getUniformLocation(std::string uniformName) const
+int Shader::get_uniform_location(std::string uniformName) const
 {
 	return glGetUniformLocation(_id, uniformName.c_str());
 }

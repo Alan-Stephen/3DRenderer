@@ -12,7 +12,7 @@ void Camera::bind(float fov, float nearPlane, float farPlane, Shader& shader, st
 	view = glm::lookAt(_position, _position + _orientation, _up);
 	projection = glm::perspective(glm::radians(fov), (float)(_width / _height), nearPlane, farPlane);
 
-	glUniformMatrix4fv(shader.getUniformLocation(uniform),1, GL_FALSE, glm::value_ptr(projection * view));
+	glUniformMatrix4fv(shader.get_uniform_location(uniform),1, GL_FALSE, glm::value_ptr(projection * view));
 }
 
 void Camera::handleInput(GLFWwindow* window)

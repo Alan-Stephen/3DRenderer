@@ -7,84 +7,112 @@ in vec3 pos;
 uniform sampler2D diffuse_tex;
 uniform sampler2D specular_tex;
 
-uniform vec3 light_pos;
-uniform vec3 light_col;
+
 uniform vec3 cam_pos;
 
+struct SpotLight {
+    vec3 position;
+    vec3 direction;
+  
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+
+    float cutoff;
+    float outer_cutoff;
+};
+
+struct DirectionalLight {
+    vec3 direction;
+  
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};
+
+
+struct PointLight {
+	vec3 position;   
+	vec3 diffuse;    
+	vec3 specular;   
+	vec3 ambient;    
+
+	float constant;
+	float linear;
+	float quadratic;
+};
+
+#define NUM_POINT_LIGHTS 4
+#define NUM_SPOT_LIGHTS 4
+uniform PointLight point_lights[NUM_POINT_LIGHTS];
+uniform SpotLight spot_lights[NUM_SPOT_LIGHTS];
+uniform DirectionalLight directional_light;
+
 out vec4 fragColour;
-vec3 direct_light()
+
+vec3 calculate_direct_light(DirectionalLight light, vec3 normal, vec3 view_direction)
 {
-	// ambient lighting
-	float ambient = 0.20f;
+    vec3 lightDir = normalize(light.direction);
+    // diffuse shading
+    float diff = max(dot(normal, lightDir), 0.0);
+    // specular shading
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float spec = pow(max(dot(view_direction, reflectDir), 0.0), 16);
+    // combine results
 
-	// diffuse lighting
-	vec3 normal = normalize(norm);
-	vec3 light_direction = normalize(vec3(1.0f, 1.0f, 0.0f));
-	float diffuse = max(dot(normal, light_direction), 0.0f);
+	vec3 diffuse_res = vec3(texture(diffuse_tex, tex));
+    vec3 ambient  = light.ambient  * diffuse_res;
+    vec3 diffuse  = light.diffuse  * diff * diffuse_res;
+    vec3 specular = light.specular * spec * vec3(texture(specular_tex, tex));
+    return (ambient + diffuse + specular);
+}  
 
-	// specular lighting
-	float specular_light = 0.50f;
-	vec3 view_direction = normalize(cam_pos - pos);
-	vec3 reflection_direction = reflect(-light_direction, normal);
-	float specular_amount = pow(max(dot(view_direction, reflection_direction), 0.0f), 16);
-	float specular = specular_amount * specular_light;
-
-	return vec3(texture(diffuse_tex, tex)) * (diffuse + ambient) + texture(specular_tex, tex).r * specular * light_col;
-}
-
-vec3 spot_light()
+vec3 calculate_spot_light(SpotLight light, vec3 normal, vec3 frag_position, vec3 view_direction) 
 {
-	// controls how big the area that is lit up is
-	float outerCone = 0.90f;
-	float innerCone = 0.95f;
+    vec3 lightDir = normalize(light.position - frag_position);
+    // diffuse shading
+    float diff = max(dot(normal, lightDir), 0.0);
+    // specular shading
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float spec = pow(max(dot(view_direction, reflectDir), 0.0), 16); // 16 is shininess
+    // attenuation
+    float distance    = length(light.position - frag_position);
 
-	// ambient lighting
-	float ambient = 0.20f;
+    // angle 
+    float angle = dot(vec3(0.0f,-1.0f, 0.0f), -lightDir);
+    float intensity = clamp((angle - light.outer_cutoff) / (light.cutoff - light.outer_cutoff), 0.0f, 1.0f);
 
-	// diffuse lighting
-	vec3 normal = normalize(norm);
-	vec3 light_direction = normalize(light_pos - pos);
-	float diffuse = max(dot(normal, light_direction), 0.0f);
 
-	// specular lighting
-	float specular_light = 0.50f;
-	vec3 view_direction = normalize(cam_pos - pos);
-	vec3 reflection_direction = reflect(-light_direction, normal);
-	float spec_amount = pow(max(dot(view_direction, reflection_direction), 0.0f), 16);
-	float specular = spec_amount * specular_light;
+	vec3 diffuse_res = vec3(texture(diffuse_tex, tex));
+    vec3 ambient  = light.ambient  * diffuse_res;
+    vec3 diffuse  = light.diffuse  * diff * diffuse_res * intensity;
+    vec3 specular = light.specular * spec * vec3(texture(specular_tex, tex)) * intensity;
 
-	// calculates the intensity of the crntPos based on its angle to the center of the light cone
-	float angle = dot(vec3(0.0f, -1.0f, 0.0f), -light_direction);
-	float inten = clamp((angle - outerCone) / (innerCone - outerCone), 0.0f, 1.0f);
-
-	return vec3(texture(diffuse_tex, tex) * (diffuse * inten + ambient) + texture(specular_tex, tex).r * specular * inten) * light_col;
+    return (ambient + diffuse + specular);
 }
 
-vec3 point_light() {
+vec3 calculate_point_light(PointLight light, vec3 normal, vec3 frag_position, vec3 view_direction) {
+    vec3 lightDir = normalize(light.position - frag_position);
+    // diffuse shading
+    float diff = max(dot(normal, lightDir), 0.0);
+    // specular shading
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float spec = pow(max(dot(view_direction, reflectDir), 0.0), 16); // 16 is shininess
+    // attenuation
+    float distance    = length(light.position - frag_position);
+    float attenuation = 1.0 / (light.constant + light.linear * distance + 
+  			     light.quadratic * (distance * distance));    
+    // combine results
+	vec3 diffuse_res = vec3(texture(diffuse_tex, tex));
+    vec3 ambient  = light.ambient  * diffuse_res;
+    vec3 diffuse  = light.diffuse  * diff * diffuse_res;
+    vec3 specular = light.specular * spec * vec3(texture(specular_tex, tex));
 
-	vec3 light_vector = light_pos - pos;
-
-	// intensity of light with respect to distance
-	float dist = length(light_vector);
-	float a = 0.1;
-	float b = 0.01;
-	float inten = 1.0f / (a * dist * dist + b * dist + 1.0f);
-
-	float ambient = 0.1;
-
-	vec3 normal = normalize(norm);
-	vec3 light_direction = normalize(light_pos - pos);
-	float diffuse = max(dot(normal, light_direction), 0.0f);
-
-	float specular_light = 0.5;
-	vec3 view_direction = normalize(cam_pos - pos);
-	vec3 reflec_direction = reflect(-light_direction, normal);
-	float specular_amount = pow(max(dot(view_direction, reflec_direction), 0.0f), 16);
-	float specular = specular_amount * specular_light;
-
-	vec4 col = texture(diffuse_tex,tex);
-	return (vec3(col) * (diffuse * inten + ambient) + texture(specular_tex, tex).r * specular * inten) * light_col;
+    diffuse  *= attenuation;
+    specular *= attenuation;
+    return (ambient + diffuse + specular);
 }
+
 void main()
 {
 	vec4 col = texture(diffuse_tex,tex);
@@ -93,6 +121,17 @@ void main()
 	if(a == 0.0) {
 		discard;
 	}
+    vec3 normal = normalize(norm);
+    vec3 view_direction = normalize(cam_pos - pos);
+	
+	vec3 result = calculate_direct_light(directional_light, normal, view_direction); 
+	for(int i = 0; i < NUM_POINT_LIGHTS; i++) {
+		result += calculate_point_light(point_lights[i], normal,pos,view_direction);
+	}
 
-	fragColour = vec4(point_light(),a);
+    for(int i = 0; i < NUM_SPOT_LIGHTS; i++) {
+		result += calculate_spot_light(spot_lights[i], normal,pos,view_direction);
+	}
+	
+	fragColour = vec4(result, a);
 }
