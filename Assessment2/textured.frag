@@ -3,9 +3,11 @@
 in vec2 tex;
 in vec3 norm;
 in vec3 pos;
+in vec4 frag_pos_light;
 
 uniform sampler2D diffuse_tex;
 uniform sampler2D specular_tex;
+uniform sampler2D shadow_map;
 uniform float shininess;
 
 
@@ -58,13 +60,29 @@ vec3 calculate_direct_light(DirectionalLight light, vec3 normal, vec3 view_direc
     float diff = max(dot(normal, lightDir), 0.0);
     // specular shading
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(view_direction, reflectDir), 0.0), shininess);
+    float spec = pow(max(dot(view_direction, reflectDir), 0.0), shininess); // shininess a bit too high thoguh
     // combine results
+
+
+    float shadow = 0.0f;
+    vec3 light_coords = frag_pos_light.xyz / frag_pos_light.w;
+
+    if(light_coords.z <= 1.0f) 
+    {
+        light_coords = (light_coords + 1.0f) / 2.0f;
+
+        float closest_depth = texture(shadow_map, light_coords.xy).r;
+        float current_depth = light_coords.z;
+
+        if(current_depth > closest_depth + 0.0005) {
+            shadow = 1.0f;
+        }
+    }
 
 	vec3 diffuse_res = vec3(texture(diffuse_tex, tex));
     vec3 ambient  = light.ambient  * diffuse_res;
-    vec3 diffuse  = light.diffuse  * diff * diffuse_res;
-    vec3 specular = light.specular * spec * vec3(texture(specular_tex, tex));
+    vec3 diffuse  = light.diffuse  * diff * diffuse_res * (1 - shadow);
+    vec3 specular = light.specular * spec * vec3(texture(specular_tex, tex)) * (1 - shadow);
     return (ambient + diffuse + specular);
 }  
 
@@ -126,13 +144,13 @@ void main()
     vec3 view_direction = normalize(cam_pos - pos);
 	
 	vec3 result = calculate_direct_light(directional_light, normal, view_direction); 
-	for(int i = 0; i < NUM_POINT_LIGHTS; i++) {
-		result += calculate_point_light(point_lights[i], normal,pos,view_direction);
-	}
+	//for(int i = 0; i < NUM_POINT_LIGHTS; i++) {
+		//result += calculate_point_light(point_lights[i], normal,pos,view_direction);
+	//}
 
-    for(int i = 0; i < NUM_SPOT_LIGHTS; i++) {
-		result += calculate_spot_light(spot_lights[i], normal,pos,view_direction);
-	}
+    //for(int i = 0; i < NUM_SPOT_LIGHTS; i++) {
+		//result += calculate_spot_light(spot_lights[i], normal,pos,view_direction);
+	//}
 	
 	fragColour = vec4(result, a);
 }

@@ -26,6 +26,8 @@
 #define NUM_SPOT_LIGHTS 4
 const int width = 1200;
 const int height = 800;
+unsigned int shadow_width = 2028;
+unsigned int shadow_height = 2028;
 
 
 void SizeCallback(GLFWwindow* window, int w, int h)
@@ -43,21 +45,21 @@ void processKeyboard(GLFWwindow* window)
 
 void render_scene(std::vector<std::unique_ptr<Model>> &models, Camera &camera, Shader &shader, GLFWwindow *window) 
 {
-		camera.bind(45, 0.01f, 1000.f, shader, "cameraMat");
+	camera.bind(45, 0.01f, 1000.f, shader, "cameraMat");
 
-		glClearColor(0.f, 0.f, 0.f, 0.f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glClearColor(0.f, 0.f, 0.f, 0.f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-		glUniform3fv(shader.get_uniform_location("cam_pos"), 1, glm::value_ptr(camera.get_pos()));
+	glUniform3fv(shader.get_uniform_location("cam_pos"), 1, glm::value_ptr(camera.get_pos()));
 
-		for(int i = 0; i < models.size(); i++) {
-			models.at(i).get()->draw(shader);
-		}
+	for(int i = 0; i < models.size(); i++) {
+		models.at(i).get()->draw(shader);
+	}
 
-		glBindVertexArray(0);
+	glBindVertexArray(0);
 
-		glfwSwapBuffers(window);
+	glfwSwapBuffers(window);
 
 }
 
@@ -120,17 +122,16 @@ int main(int argc, char** argv)
 		spot_lights[i].bind_at(i, "spot_lights", shader);
 	}
 
-	DirectionalLight directional_light = DirectionalLight(glm::vec3(.0f,1.0f,.0f),
-		glm::vec3(0.0f, 0.0f,0.0f),
-		glm::vec3(.8, 0.8,0.75),
-		glm::vec3(0.8f, 0.8f,0.75));
+	DirectionalLight directional_light = DirectionalLight(glm::vec3(1.0f,1.0f,1.0f),
+		glm::vec3(0.3f, 0.3f,0.3f),
+		glm::vec3(1., 1.,1.),
+		glm::vec3(0.9f, 0.9f,0.9));
 
 	directional_light.bind(shader);
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 
-	glEnable(GL_FRAMEBUFFER_SRGB);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glEnable(GL_CULL_FACE);
@@ -139,7 +140,6 @@ int main(int argc, char** argv)
 	
 	// enable shadows
 
-	/*
 	unsigned int shadow_map_fbo;
 	glGenFramebuffers(1, &shadow_map_fbo);
 
@@ -164,8 +164,14 @@ int main(int argc, char** argv)
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	*/
 
+	glm::mat4 orthogonal_projection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 1000.0f);
+	glm::mat4 light_view = glm::lookAt(300.f * glm::vec3(1.f, 1.0f, 1.0f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.0f, 0.f));
+	glm::mat4 light_projection = orthogonal_projection * light_view;
+
+	shadow_shader.bind();
+	glUniformMatrix4fv(shadow_shader.get_uniform_location("light_projection"), 1, GL_FALSE, glm::value_ptr(light_projection));
+	shader.bind();
 
 	Camera camera = Camera(width, height, glm::vec3(0.0, 0.0, 0.0));
 
@@ -193,6 +199,24 @@ int main(int argc, char** argv)
 		processKeyboard(window);
 		camera.handleInput(window);
 
+		shadow_shader.bind();
+		glEnable(GL_DEPTH_TEST);
+		glViewport(0, 0, shadow_width, shadow_height);
+		glBindFramebuffer(GL_FRAMEBUFFER, shadow_map_fbo);
+		glClear(GL_DEPTH_BUFFER_BIT);
+
+		for(int i = 0; i < models.size(); i++) {
+			models.at(i).get()->draw(shadow_shader);
+		}	
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glViewport(0, 0, width, height);
+		shader.bind();
+
+		glUniformMatrix4fv(shader.get_uniform_location("light_projection"), 1, GL_FALSE, glm::value_ptr(light_projection));
+		glActiveTexture(GL_TEXTURE0 + 2);
+		glBindTexture(GL_TEXTURE_2D, shadow_map);
+		glUniform1i(shader.get_uniform_location("shadow_map"), 2);
 		render_scene(models, camera, shader, window);
 
 		glfwPollEvents();

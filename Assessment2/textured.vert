@@ -6,15 +6,19 @@ layout(location = 2) in vec2 aTex;
 
 uniform mat4 model;
 uniform mat4 cameraMat;
+uniform mat4 light_projection;
 
 out vec2 tex;
 out vec3 norm;
 out vec3 pos;
+out vec4 frag_pos_light;
 
 void main()
 {
-	gl_Position = cameraMat * model * vec4(aPos, 1.f);
 	tex = aTex;
 	norm = aNorms;
 	pos = vec3(model * vec4(aPos, 1.0f));
+	frag_pos_light = light_projection * vec4(pos, 1.0f);
+	gl_Position =	cameraMat * vec4(pos, 1.0f);
+
 }
