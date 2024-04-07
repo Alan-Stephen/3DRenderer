@@ -43,14 +43,65 @@ void processKeyboard(GLFWwindow* window)
 		glfwSetWindowShouldClose(window, true);
 }
 
-void render_scene(std::vector<std::unique_ptr<Model>> &models, Camera &camera, Shader &shader, GLFWwindow *window) 
+void set_up_shadow_map(Shader &shadow_shader, unsigned int &shadow_map_fbo, unsigned int &shadow_map, glm::mat4 &light_projection) 
 {
-	camera.bind(45, 0.01f, 1000.f, shader, "cameraMat");
+	glGenFramebuffers(1, &shadow_map_fbo);
 
+	glGenTextures(1, &shadow_map);
+	glBindTexture(GL_TEXTURE_2D, shadow_map);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, shadow_width, shadow_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+	float clampColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, clampColor);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, shadow_map_fbo);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadow_map, 0);
+
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glm::mat4 orthogonal_projection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 1000.0f);
+	glm::mat4 light_view = glm::lookAt(300.f * glm::vec3(1.f, 1.0f, 1.0f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.0f, 0.f));
+	light_projection = orthogonal_projection * light_view;
+
+	shadow_shader.bind();
+	glUniformMatrix4fv(shadow_shader.get_uniform_location("light_projection"), 1, GL_FALSE, glm::value_ptr(light_projection));
+}
+void render_shadow_map(Shader &shadow_shader, unsigned int shadow_map_fbo, std::vector<std::unique_ptr<Model>> &models) {
+		shadow_shader.bind();
+		glEnable(GL_DEPTH_TEST);
+		glViewport(0, 0, shadow_width, shadow_height);
+		glBindFramebuffer(GL_FRAMEBUFFER, shadow_map_fbo);
+		glClear(GL_DEPTH_BUFFER_BIT);
+
+		for(int i = 0; i < models.size(); i++) {
+			models.at(i).get()->draw(shadow_shader);
+		}	
+}
+
+void render_scene(std::vector<std::unique_ptr<Model>> &models, Camera &camera, Shader &shader, glm::mat4 &light_projection, unsigned int shadow_map) 
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, width, height);
 	glClearColor(0.f, 0.f, 0.f, 0.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+	shader.bind();
+
+	glUniformMatrix4fv(shader.get_uniform_location("light_projection"), 1, GL_FALSE, glm::value_ptr(light_projection));
+	glActiveTexture(GL_TEXTURE0 + 2);
+	glBindTexture(GL_TEXTURE_2D, shadow_map);
+	glUniform1i(shader.get_uniform_location("shadow_map"), 2);
+
+	camera.bind(45, 0.01f, 1000.f, shader, "cameraMat");
+
+	// todo move this into camera.bind
 	glUniform3fv(shader.get_uniform_location("cam_pos"), 1, glm::value_ptr(camera.get_pos()));
 
 	for(int i = 0; i < models.size(); i++) {
@@ -59,7 +110,6 @@ void render_scene(std::vector<std::unique_ptr<Model>> &models, Camera &camera, S
 
 	glBindVertexArray(0);
 
-	glfwSwapBuffers(window);
 
 }
 
@@ -138,39 +188,12 @@ int main(int argc, char** argv)
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
 	
-	// enable shadows
-
 	unsigned int shadow_map_fbo;
-	glGenFramebuffers(1, &shadow_map_fbo);
-
-	unsigned int shadow_width = 2028;
-	unsigned int shadow_height = 2028;
-
 	unsigned int shadow_map;
-	glGenTextures(1, &shadow_map);
-	glBindTexture(GL_TEXTURE_2D, shadow_map);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, shadow_width, shadow_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glm::mat4 light_projection;
+	// enable shadows
+	set_up_shadow_map(shadow_shader, shadow_map_fbo, shadow_map, light_projection);
 
-	float clampColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, clampColor);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, shadow_map_fbo);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadow_map, 0);
-
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	glm::mat4 orthogonal_projection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 1000.0f);
-	glm::mat4 light_view = glm::lookAt(300.f * glm::vec3(1.f, 1.0f, 1.0f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.0f, 0.f));
-	glm::mat4 light_projection = orthogonal_projection * light_view;
-
-	shadow_shader.bind();
-	glUniformMatrix4fv(shadow_shader.get_uniform_location("light_projection"), 1, GL_FALSE, glm::value_ptr(light_projection));
 	shader.bind();
 
 	Camera camera = Camera(width, height, glm::vec3(0.0, 0.0, 0.0));
@@ -199,26 +222,11 @@ int main(int argc, char** argv)
 		processKeyboard(window);
 		camera.handleInput(window);
 
-		shadow_shader.bind();
-		glEnable(GL_DEPTH_TEST);
-		glViewport(0, 0, shadow_width, shadow_height);
-		glBindFramebuffer(GL_FRAMEBUFFER, shadow_map_fbo);
-		glClear(GL_DEPTH_BUFFER_BIT);
 
-		for(int i = 0; i < models.size(); i++) {
-			models.at(i).get()->draw(shadow_shader);
-		}	
+		render_shadow_map(shadow_shader, shadow_map_fbo, models);
+		render_scene(models, camera, shader, light_projection, shadow_map);
 
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glViewport(0, 0, width, height);
-		shader.bind();
-
-		glUniformMatrix4fv(shader.get_uniform_location("light_projection"), 1, GL_FALSE, glm::value_ptr(light_projection));
-		glActiveTexture(GL_TEXTURE0 + 2);
-		glBindTexture(GL_TEXTURE_2D, shadow_map);
-		glUniform1i(shader.get_uniform_location("shadow_map"), 2);
-		render_scene(models, camera, shader, window);
-
+		glfwSwapBuffers(window);
 		glfwPollEvents();
 
 		processKeyboard(window);
