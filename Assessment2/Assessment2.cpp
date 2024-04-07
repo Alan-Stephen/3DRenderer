@@ -66,7 +66,7 @@ void set_up_shadow_map(Shader &shadow_shader, unsigned int &shadow_map_fbo, unsi
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	glm::mat4 orthogonal_projection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 1000.0f);
-	glm::mat4 light_view = glm::lookAt(300.f * glm::vec3(1.f, 1.0f, 1.0f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.0f, 0.f));
+	glm::mat4 light_view = glm::lookAt(500.f * glm::vec3(.001f, 1.0f, .001f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.0f, 0.f));
 	light_projection = orthogonal_projection * light_view;
 
 	shadow_shader.bind();
@@ -109,8 +109,6 @@ void render_scene(std::vector<std::unique_ptr<Model>> &models, Camera &camera, S
 	}
 
 	glBindVertexArray(0);
-
-
 }
 
 
@@ -136,7 +134,9 @@ int main(int argc, char** argv)
 	std::vector<std::unique_ptr<Model>> models;
 
 	models.push_back(std::make_unique<Model>("objs/floor/floor.obj", glm::mat4(1.0f), glm::vec3(128.0f, 1.f, 128.f), glm::vec3(00.f, 0.f, 00.f)));
-	models.push_back(std::make_unique<Model>("objs/white_oak/white_oak.obj", glm::mat4(1.0f), glm::vec3(.1f, 0.1f, 0.1f), glm::vec3(00.f, 00.f, 00.f)));
+	models.push_back(std::make_unique<Model>("objs/house/house.obj", glm::mat4(1.0f), glm::vec3(5.f, 5.f, 5.f), glm::vec3(00.f, 4.f, 00.f)));
+	models.push_back(std::make_unique<Model>("objs/white_oak/white_oak.obj", glm::mat4(1.0f), glm::vec3(.1f, .1f, .1f), glm::vec3(300.f, 10.f, 300.f)));
+
 	std::cout << "FINISHED PARSING\n";
 
 	shader.bind();
@@ -172,7 +172,7 @@ int main(int argc, char** argv)
 		spot_lights[i].bind_at(i, "spot_lights", shader);
 	}
 
-	DirectionalLight directional_light = DirectionalLight(glm::vec3(1.0f,1.0f,1.0f),
+	DirectionalLight directional_light = DirectionalLight(glm::vec3(.001f,1.0f,.001f),
 		glm::vec3(0.3f, 0.3f,0.3f),
 		glm::vec3(1., 1.,1.),
 		glm::vec3(0.9f, 0.9f,0.9));
@@ -213,7 +213,8 @@ int main(int argc, char** argv)
 		if (diff >= (1.0 / 2.0)) {
 			std::string fps = std::to_string((1 / diff) * count);
 			std::string frame_time = std::to_string((diff / count) * 1000);
-			std::string title = fps + " / " + frame_time + " ms";
+			std::string position = std::to_string(camera.get_pos().x) + "," + std::to_string(camera.get_pos().y) + "," + std::to_string(camera.get_pos().z);
+			std::string title = fps + " / " + frame_time + " ms" + "/ position: " + position;
 			glfwSetWindowTitle(window, title.c_str());
 			prev_time = curr_time;
 			count = 0;

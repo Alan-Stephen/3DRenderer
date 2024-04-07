@@ -63,14 +63,14 @@ int m_mtl_parse(char* filename, std::vector<Material> &mtls)
 	size_t lastSlashPos = std::string(filename).find_last_of('/');
 	std::string prefix = std::string(filename).substr(0, lastSlashPos);
 
-	std::string name;
+	std::string name = "[ERROR-NAME-10293]";
 	std::string ambient_fil  = "";
 	std::string specular_fil = "";
 	std::string diffuse_fil  = "";
 	RGBA ambient_color  = RGBA(1.0f,1.0f,1.0f,1.0f);
 	RGBA diffuse_color  = RGBA(1.0f,1.0f,1.0f,1.0f);
 	RGBA specular_color = RGBA(1.0f,1.0f,1.0f,1.0f);
-	float shininess;
+	float shininess = 8;
 
 	bool currently_parsing = false;
 	for (std::string line; std::getline(infile, line);) {
@@ -93,6 +93,15 @@ int m_mtl_parse(char* filename, std::vector<Material> &mtls)
 					shininess,
 					name
 				);
+
+				name = "[ERROR-NAME-10293]";
+				ambient_fil  = "";
+				specular_fil = "";
+				diffuse_fil  = "";
+				ambient_color  = RGBA(1.0f,1.0f,1.0f,1.0f);
+				diffuse_color  = RGBA(1.0f,1.0f,1.0f,1.0f);
+				specular_color = RGBA(1.0f,1.0f,1.0f,1.0f);
+				shininess = 8;
 			}
 
 			name = tokens.at(1);
@@ -144,13 +153,43 @@ void m_create_mappings(const std::vector<Material>& materials, std::unordered_ma
 	}
 }
 
+std::vector<std::string> split_no_strip(const std::string& s, const char* delim) {
+	std::vector<std::string> res;
+	size_t start = 0;
+	size_t end = s.find(delim);
+
+	res.reserve(10); 
+
+	while (end != std::string::npos) {
+		std::string token = s.substr(start, end - start);
+		m_remove_tabs(token);
+
+		res.push_back(token);
+
+		start = end + strlen(delim);
+		end = s.find(delim, start);
+	}
+
+	std::string lastToken = s.substr(start);
+	res.push_back(lastToken);
+
+	return res;
+}
+
 // creates a vertex given face indicies e.g 1/1/1
 Vertex m_create_vertex_from_indicies(const std::string &indicies, const std::vector<glm::vec3> &vecs,const std::vector<glm::vec2> &uvs, const std::vector<glm::vec3> &norms) {
-	std::vector<std::string> tokens = m_split(indicies, "/");
+	std::vector<std::string> tokens = split_no_strip(indicies, "/");
 	
 	assert(tokens.size() >= 3);
 	glm::vec3 vec = vecs.at(std::stoi(tokens.at(0)) - 1);
-	glm::vec2 tex = uvs.at(std::stoi(tokens.at(1)) - 1);
+	glm::vec2 tex;
+
+	if (tokens.at(1).empty()) {
+		tex = glm::vec2(0.0f, 0.0f);
+	} else {
+		tex = uvs.at(std::stoi(tokens.at(1)) - 1);
+	}
+
 	glm::vec3 norm = norms.at(std::stoi(tokens.at(2)) - 1);
 
 	return Vertex(vec,tex, norm);

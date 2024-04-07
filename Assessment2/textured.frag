@@ -71,12 +71,25 @@ vec3 calculate_direct_light(DirectionalLight light, vec3 normal, vec3 view_direc
     {
         light_coords = (light_coords + 1.0f) / 2.0f;
 
-        float closest_depth = texture(shadow_map, light_coords.xy).r;
+        float closest_depth;
         float current_depth = light_coords.z;
 
-        if(current_depth > closest_depth + 0.0005) {
-            shadow = 1.0f;
-        }
+        float bias = max(0.05 * (1 - dot(normal,lightDir)), 0.00005);
+        int sampleRadius = 4;
+
+		vec2 pixelSize = 1.0 / textureSize(shadow_map, 0);
+		for(int y = -sampleRadius; y <= sampleRadius; y++)
+		{
+		    for(int x = -sampleRadius; x <= sampleRadius; x++)
+		    {
+		        closest_depth = texture(shadow_map, light_coords.xy + vec2(x, y) * pixelSize).r;
+				if (current_depth > closest_depth + bias)
+					shadow += 1.0f;     
+		    }    
+		}
+
+		// Get average shadow
+		shadow /= pow((sampleRadius * 2 + 1), 2);
     }
 
 	vec3 diffuse_res = vec3(texture(diffuse_tex, tex));
