@@ -139,7 +139,7 @@ int main(int argc, char** argv)
 	models.push_back(std::make_unique<Model>("objs/floor/floor.obj", glm::mat4(1.0f), glm::vec3(128.0f, 1.f, 128.f), glm::vec3(00.f, 0.f, 00.f)));
 	//models.push_back(std::make_unique<Model>("objs/doughnut2/doughnut2.obj", glm::mat4(1.0f), glm::vec3(50.f, 50.f, 50.f), glm::vec3(00.f, 4.f, 00.f)));
 	//models.push_back(std::make_unique<Model>("objs/white_oak/white_oak.obj", glm::mat4(1.0f), glm::vec3(.1f, .1f, .1f), glm::vec3(300.f, 10.f, 300.f)));
-	Water water = Water(glm::mat4(1.0f), 200,200);
+	Water water = Water(glm::mat4(1.0f), 200,200, glm::vec3(1.0,1.0,1.0), glm::vec3(0,-30,0));
 
 	std::cout << "FINISHED PARSING\n";
 
@@ -176,12 +176,13 @@ int main(int argc, char** argv)
 		spot_lights[i].bind_at(i, "spot_lights", shader);
 	}
 
-	DirectionalLight directional_light = DirectionalLight(glm::vec3(.001f,1.0f,.001f),
-		glm::vec3(0.05f, 0.05f,0.05f),
-		glm::vec3(0.1, 0.1,0.1),
-		glm::vec3(0.2f, 0.2f,0.2));
+	DirectionalLight directional_light = DirectionalLight(glm::vec3(.1f,1.0f,.1f),
+		glm::vec3(0.0f, 0.0f,0.0f),
+		glm::vec3(0.9, 0.9,0.9),
+		glm::vec3(1.0f, 1.0f,1.0));
 
 	directional_light.bind(shader);
+	directional_light.bind(water_shader);
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
@@ -189,7 +190,7 @@ int main(int argc, char** argv)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	water_shader.bind();
-	glUniform3fv(water_shader.get_uniform_location("light_pos"), 1, glm::value_ptr(glm::vec3(100.1f, 500.0f, 100.1f)));
+	glUniform3fv(water_shader.get_uniform_location("light_pos"), 1, glm::value_ptr(glm::vec3(100.1f, 100.0f, 100.1f)));
 	glUniform3fv(water_shader.get_uniform_location("light_col"), 1, glm::value_ptr(glm::vec3(1.0f, 1.0f, 1.0f)));
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);

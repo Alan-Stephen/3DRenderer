@@ -22,9 +22,9 @@ struct SubWave {
 };
 
 SubWave subwaves[NUM_SUBWAVES] = SubWave[](
-    SubWave(10.0, 2.0 / 25.0, 4.0, vec2(1.0, 0.5)), // SubWave 1
-    SubWave(.5, 2.0 / 10.0, 6.0, vec2(1.0, 1.0)), // SubWave 2
-    SubWave(0.1, 2.0 / 5.0, 10.0, vec2(0.0, 0.8)) // SubWave 3
+    SubWave(10.0, 2.0 / 25.0, 4.0, vec2(1.0, 1.0)), // SubWave 1
+    SubWave(3.5, 2.0 / 10.0, 6.0, vec2(0.0, .8)), // SubWave 2
+    SubWave(0.5, 2.0 / 5.0, 1.0, vec2(0.9, 0.0)) // SubWave 3
 );
 
 void main()
@@ -55,7 +55,8 @@ void main()
         pos.y += y_offset;
     }
 
-    norm = normalize(vec3(-ddx, -ddz, 1.0));
+    // it looks different to the formula in GPU gems because they use weird (x,z,y) format idk why
+    norm = normalize(vec3(-ddx, 1, -ddz));
     // Transform the position to camera space and set gl_Position
     gl_Position = cameraMat * vec4(pos, 1f);
 }

@@ -13,6 +13,7 @@ private:
 	float   _shininess;
 	std::string _name;
 public:
+	Material() {};
 	Material(const Texture &ambient, const Texture &specular, const Texture &diffuse, float shininess, const std::string &name);
 	void deinit();
 	void bind(const Shader &shader) const;

@@ -1,7 +1,15 @@
 #include "Water.h"
 
-Water::Water(glm::mat4 model, unsigned int height, unsigned int width) : _model(model)
+Water::Water(glm::mat4 model, unsigned int height, unsigned int width, glm::vec3 scale, glm::vec3 translate)
 {
+
+    Texture specular = Texture("", true, RGBA(1.0,1.0,1.0,1.0f));
+    Texture diffuse = Texture("", true, RGBA(.1,.5,1.0,1.0f));
+    int shininess = 16;
+
+    _material = Material(diffuse, specular, diffuse, shininess, "water");
+    _model = glm::scale(model, scale);
+    _model = glm::translate(_model, translate);
     // Calculate the number of _verts needed
     int num__verts = height * width * 6; // Each quad has two triangles, each triangle has three _verts
 
@@ -39,6 +47,7 @@ Water::Water(glm::mat4 model, unsigned int height, unsigned int width) : _model(
 
 void Water::draw(Shader& shader)
 {
+    _material.bind(shader);
     glUniformMatrix4fv(shader.get_uniform_location("model"), 1, GL_FALSE, glm::value_ptr(_model));
     glUniform1f(shader.get_uniform_location("time"), static_cast<float>(glfwGetTime()));
 	glBindVertexArray(_vao);
@@ -48,6 +57,7 @@ void Water::draw(Shader& shader)
 Water::~Water()
 {
     std::cout << "DECONSTRUCTING WATER MESH " << _vao << std::endl;
+    _material.deinit();
 	glDeleteBuffers(1, &_vbo);
 	glDeleteVertexArrays(1, &_vao);
 

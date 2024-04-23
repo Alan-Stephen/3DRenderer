@@ -3,6 +3,7 @@
 
 void PointLight::bind_at(unsigned int slot, std::string array_name, const Shader &shader) const
 {
+    shader.bind();
     std::string positionUniformName = array_name + "[" + std::to_string(slot) + "].position";
     std::string ambientUniformName = array_name + "[" + std::to_string(slot) + "].ambient";
     std::string diffuseUniformName = array_name + "[" + std::to_string(slot) + "].diffuse";
@@ -31,7 +32,7 @@ void PointLight::bind_at(unsigned int slot, std::string array_name, const Shader
 
 void DirectionalLight::bind(const Shader& shader) const
 {
-
+    shader.bind();
     const std::string array_name = "directional_light";
     std::string directionUniformName = array_name + ".direction";
     std::string ambientUniformName = array_name + ".ambient";
@@ -54,6 +55,7 @@ void DirectionalLight::bind(const Shader& shader) const
 
 void SpotLight::bind_at(unsigned int slot, const std::string& array_name, const Shader& shader) const
 {
+    shader.bind();
     std::string positionUniformName = array_name + "[" + std::to_string(slot) + "].position";
     std::string directionUniformName = array_name + "[" + std::to_string(slot) + "].direction";
     std::string ambientUniformName = array_name + "[" + std::to_string(slot) + "].ambient";

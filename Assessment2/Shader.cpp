@@ -19,7 +19,7 @@ unsigned int Shader::getId() const
 	return _id;
 }
 
-void Shader::bind()
+void Shader::bind() const
 {
 	glUseProgram(_id);
 }
