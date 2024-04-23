@@ -21,7 +21,7 @@ public:
 	int _height;
 	int _width;
 
-	float _speed = 0.1f;
+	float _speed = 0.5f;
 	float _sensitivity = 100.f;
 
 	bool _firstClick = true;

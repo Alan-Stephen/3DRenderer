@@ -60,7 +60,7 @@ vec3 calculate_direct_light(DirectionalLight light, vec3 normal, vec3 view_direc
     float diff = max(dot(normal, lightDir), 0.0);
     // specular shading
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(view_direction, reflectDir), 0.0), shininess); // shininess a bit too high thoguh
+    float spec = pow(max(dot(view_direction, reflectDir), 0.0), 16); // shininess a bit too high thoguh
     // combine results
 
 
@@ -106,7 +106,7 @@ vec3 calculate_spot_light(SpotLight light, vec3 normal, vec3 frag_position, vec3
     float diff = max(dot(normal, lightDir), 0.0);
     // specular shading
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(view_direction, reflectDir), 0.0), shininess); // 16 is shininess
+    float spec = pow(max(dot(view_direction, reflectDir), 0.0), 16); // 16 is shininess
     // attenuation
     float distance    = length(light.position - frag_position);
 
@@ -157,13 +157,13 @@ void main()
     vec3 view_direction = normalize(cam_pos - pos);
 	
 	vec3 result = calculate_direct_light(directional_light, normal, view_direction); 
-	//for(int i = 0; i < NUM_POINT_LIGHTS; i++) {
-		//result += calculate_point_light(point_lights[i], normal,pos,view_direction);
-	//}
+	for(int i = 0; i < NUM_POINT_LIGHTS; i++) {
+		result += calculate_point_light(point_lights[i], normal,pos,view_direction);
+	}
 
-    //for(int i = 0; i < NUM_SPOT_LIGHTS; i++) {
-		//result += calculate_spot_light(spot_lights[i], normal,pos,view_direction);
-	//}
+    for(int i = 0; i < NUM_SPOT_LIGHTS; i++) {
+		result += calculate_spot_light(spot_lights[i], normal,pos,view_direction);
+	}
 	
 	fragColour = vec4(result, a);
 }

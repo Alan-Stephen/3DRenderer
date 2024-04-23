@@ -44,11 +44,11 @@ void Camera::handleInput(GLFWwindow* window)
 	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 	{
-		_speed = 0.4f;
+		_speed = 1.4f;
 	}
 	else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
 	{
-		_speed = 0.1f;
+		_speed = 1.1f;
 	}
 
 

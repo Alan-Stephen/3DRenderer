@@ -23,9 +23,8 @@ Mesh::Mesh(const std::vector<Vertex> &verts, unsigned int material_ref) :
 void Mesh::deinit()
 {
 	std::cout << "DECONSTRUCTING MESH " << _vao << std::endl;
-	glDeleteVertexArrays(1, &_vao);
 	glDeleteBuffers(1, &_vbo);
-
+	glDeleteVertexArrays(1, &_vao);
 }
 
 void Mesh::draw() const

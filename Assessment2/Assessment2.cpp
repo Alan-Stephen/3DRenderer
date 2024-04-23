@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 #include "Light.h"
+#include "Water.h"
 
 #define NUM_POINT_LIGHTS 4
 #define NUM_SPOT_LIGHTS 4
@@ -126,16 +127,19 @@ int main(int argc, char** argv)
 	glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageCallback(DebguMessageCallback, 0);
 
+	std::cout << "COMPILING SHADERS\n";
 	Shader shader("textured.vert", "textured.frag");
 	Shader shadow_shader("shadow.vert", "shadow.frag");
+	Shader water_shader("water.vert", "water.frag");
 	std::cout << "COMPILED SHADERS\n";
 
 	std::cout << "PARSING OBJECTS\n";
 	std::vector<std::unique_ptr<Model>> models;
 
 	models.push_back(std::make_unique<Model>("objs/floor/floor.obj", glm::mat4(1.0f), glm::vec3(128.0f, 1.f, 128.f), glm::vec3(00.f, 0.f, 00.f)));
-	models.push_back(std::make_unique<Model>("objs/house/house.obj", glm::mat4(1.0f), glm::vec3(5.f, 5.f, 5.f), glm::vec3(00.f, 4.f, 00.f)));
-	models.push_back(std::make_unique<Model>("objs/white_oak/white_oak.obj", glm::mat4(1.0f), glm::vec3(.1f, .1f, .1f), glm::vec3(300.f, 10.f, 300.f)));
+	//models.push_back(std::make_unique<Model>("objs/doughnut2/doughnut2.obj", glm::mat4(1.0f), glm::vec3(50.f, 50.f, 50.f), glm::vec3(00.f, 4.f, 00.f)));
+	//models.push_back(std::make_unique<Model>("objs/white_oak/white_oak.obj", glm::mat4(1.0f), glm::vec3(.1f, .1f, .1f), glm::vec3(300.f, 10.f, 300.f)));
+	Water water = Water(glm::mat4(1.0f), 200,200);
 
 	std::cout << "FINISHED PARSING\n";
 
@@ -173,9 +177,9 @@ int main(int argc, char** argv)
 	}
 
 	DirectionalLight directional_light = DirectionalLight(glm::vec3(.001f,1.0f,.001f),
-		glm::vec3(0.3f, 0.3f,0.3f),
-		glm::vec3(1., 1.,1.),
-		glm::vec3(0.9f, 0.9f,0.9));
+		glm::vec3(0.05f, 0.05f,0.05f),
+		glm::vec3(0.1, 0.1,0.1),
+		glm::vec3(0.2f, 0.2f,0.2));
 
 	directional_light.bind(shader);
 
@@ -184,7 +188,9 @@ int main(int argc, char** argv)
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glEnable(GL_CULL_FACE);
+	water_shader.bind();
+	glUniform3fv(water_shader.get_uniform_location("light_pos"), 1, glm::value_ptr(glm::vec3(100.1f, 500.0f, 100.1f)));
+	glUniform3fv(water_shader.get_uniform_location("light_col"), 1, glm::value_ptr(glm::vec3(1.0f, 1.0f, 1.0f)));
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
 	
@@ -224,8 +230,19 @@ int main(int argc, char** argv)
 		camera.handleInput(window);
 
 
+
+
 		render_shadow_map(shadow_shader, shadow_map_fbo, models);
+
 		render_scene(models, camera, shader, light_projection, shadow_map);
+
+		water_shader.bind();
+		camera.bind(45, 0.01f, 1000.f, water_shader, "cameraMat");
+		glUniform3fv(water_shader.get_uniform_location("cam_pos"), 1, glm::value_ptr(camera.get_pos()));
+		water.draw(water_shader);
+
+
+
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
