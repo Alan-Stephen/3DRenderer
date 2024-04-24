@@ -33,7 +33,7 @@ vec3 calculate_direct_light(DirectionalLight light, vec3 normal, vec3 view_direc
 	vec3 diffuse_res = vec3(0.1,0.5,1.0);
     vec3 ambient  = light.ambient  * diffuse_res;
     vec3 diffuse  = light.diffuse  * diff * diffuse_res;
-    vec3 specular = light.specular * spec * vec3(.4,.4,.4);
+    vec3 specular = light.specular * spec * vec3(.5,.5,.5);
     return (ambient + diffuse + specular);
 }  
 
