@@ -1,8 +1,7 @@
 #include "Texture.h"
 #include <string>
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
 #include <iostream>
+#include "stb_image.h"
 
 Texture::Texture() {}
 Texture::Texture(std::string filename, bool is_flat, RGBA flat_colour)

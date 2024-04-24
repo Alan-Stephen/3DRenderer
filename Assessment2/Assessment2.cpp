@@ -2,6 +2,8 @@
 
 #include <GLFW/glfw3.h>
 
+
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -11,17 +13,21 @@
 
 #include <memory>
 #include "error.h"
-#include "texture.h"
 #include "Shader.h"
 
 #include "VertexBuffer.h"
 #include "Camera.h"
-#include "Model.h"
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
 #include "Light.h"
 #include "Water.h"
+#include "Skybox.h"
+
+#include "Model.h"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 #define NUM_POINT_LIGHTS 4
 #define NUM_SPOT_LIGHTS 4
@@ -67,7 +73,7 @@ void set_up_shadow_map(Shader &shadow_shader, unsigned int &shadow_map_fbo, unsi
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	glm::mat4 orthogonal_projection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 1000.0f);
-	glm::mat4 light_view = glm::lookAt(500.f * glm::vec3(.001f, 1.0f, .001f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.0f, 0.f));
+	glm::mat4 light_view = glm::lookAt(500.f * glm::vec3(-.18, 0.42, -0.22), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.0f, 0.f));
 	light_projection = orthogonal_projection * light_view;
 
 	shadow_shader.bind();
@@ -112,8 +118,6 @@ void render_scene(std::vector<std::unique_ptr<Model>> &models, Camera &camera, S
 	glBindVertexArray(0);
 }
 
-
-
 int main(int argc, char** argv)
 {
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );  
@@ -131,6 +135,7 @@ int main(int argc, char** argv)
 	Shader shader("textured.vert", "textured.frag");
 	Shader shadow_shader("shadow.vert", "shadow.frag");
 	Shader water_shader("water.vert", "water.frag");
+	Shader skybox_shader("skybox.vert", "skybox.frag");
 	std::cout << "COMPILED SHADERS\n";
 
 	std::cout << "PARSING OBJECTS\n";
@@ -138,8 +143,8 @@ int main(int argc, char** argv)
 
 	models.push_back(std::make_unique<Model>("objs/floor/floor.obj", glm::mat4(1.0f), glm::vec3(128.0f, 1.f, 128.f), glm::vec3(00.f, 0.f, 00.f)));
 	//models.push_back(std::make_unique<Model>("objs/doughnut2/doughnut2.obj", glm::mat4(1.0f), glm::vec3(50.f, 50.f, 50.f), glm::vec3(00.f, 4.f, 00.f)));
-	//models.push_back(std::make_unique<Model>("objs/white_oak/white_oak.obj", glm::mat4(1.0f), glm::vec3(.1f, .1f, .1f), glm::vec3(300.f, 10.f, 300.f)));
-	Water water = Water(glm::mat4(1.0f), 200,200, glm::vec3(1.0,1.0,1.0), glm::vec3(0,-30,0));
+	models.push_back(std::make_unique<Model>("objs/white_oak/white_oak.obj", glm::mat4(1.0f), glm::vec3(.1f, .1f, .1f), glm::vec3(300.f, 10.f, 300.f)));
+	Water water = Water(glm::mat4(1.0f), 800,800, glm::vec3(1.0,1.0,1.0), glm::vec3(0,-30,0));
 
 	std::cout << "FINISHED PARSING\n";
 
@@ -176,10 +181,10 @@ int main(int argc, char** argv)
 		spot_lights[i].bind_at(i, "spot_lights", shader);
 	}
 
-	DirectionalLight directional_light = DirectionalLight(glm::vec3(.1f,1.0f,.1f),
+	DirectionalLight directional_light = DirectionalLight(glm::vec3(-18,42.0f,-21.1f),
 		glm::vec3(0.0f, 0.0f,0.0f),
 		glm::vec3(0.9, 0.9,0.9),
-		glm::vec3(1.0f, 1.0f,1.0));
+		glm::vec3(.4f, .4f,.4));
 
 	directional_light.bind(shader);
 	directional_light.bind(water_shader);
@@ -200,6 +205,9 @@ int main(int argc, char** argv)
 	glm::mat4 light_projection;
 	// enable shadows
 	set_up_shadow_map(shadow_shader, shadow_map_fbo, shadow_map, light_projection);
+	
+	//Skybox::init(skybox_shader);
+	Skybox skybox = Skybox(skybox_shader);
 
 	shader.bind();
 
@@ -242,8 +250,8 @@ int main(int argc, char** argv)
 		glUniform3fv(water_shader.get_uniform_location("cam_pos"), 1, glm::value_ptr(camera.get_pos()));
 		water.draw(water_shader);
 
-
-
+		skybox.draw(skybox_shader, camera.get_camera_mat(45, 0.01f, 1000.f));
+		//Skybox::draw(skybox_shader, camera.get_camera_mat(45, 0.01, 1000.f));
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

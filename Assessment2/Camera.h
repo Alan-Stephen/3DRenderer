@@ -29,6 +29,7 @@ public:
 	Camera(int width, int height, glm::vec3 position);
 
 	void bind(float fov, float nearPlane, float farPlane, Shader& shader, std::string uniform);
+	glm::mat4 get_camera_mat(float fov, float nearPlane, float farPlane);
 	void handleInput(GLFWwindow* window);
 	glm::vec3 get_pos() const;
 };

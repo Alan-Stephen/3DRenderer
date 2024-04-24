@@ -1,6 +1,7 @@
 #include "Shader.h"
 #include "GL/gl3w.h"
 #include <stdio.h>
+#include <iostream>
 #include "file.h"
 #include <string>
 
@@ -11,6 +12,7 @@ Shader::Shader(std::string vsFilename, std::string fsFilename)
 
 Shader::~Shader()
 {
+	std::cout << "DELETING SHADER: " << _id << "\n";
 	glDeleteProgram(_id);
 }
 
