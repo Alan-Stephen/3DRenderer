@@ -27,13 +27,13 @@ vec3 calculate_direct_light(DirectionalLight light, vec3 normal, vec3 view_direc
     float diff = max(dot(normal, lightDir), 0.0);
     // specular shading
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(view_direction, reflectDir), 0.0), 32); // shininess a bit too high thoguh
+    float spec = pow(max(dot(view_direction, reflectDir), 0.0), 8); // shininess a bit too high thoguh
     // combine results
 
 	vec3 diffuse_res = vec3(0.1,0.5,1.0);
     vec3 ambient  = light.ambient  * diffuse_res;
     vec3 diffuse  = light.diffuse  * diff * diffuse_res;
-    vec3 specular = light.specular * spec * vec3(1.0,1.0,1.0);
+    vec3 specular = light.specular * spec * vec3(.4,.4,.4);
     return (ambient + diffuse + specular);
 }  
 
