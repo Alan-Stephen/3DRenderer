@@ -25,6 +25,7 @@
 #include "Skybox.h"
 
 #include "Model.h"
+#include "Plane.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -142,9 +143,11 @@ int main(int argc, char** argv)
 	std::vector<std::unique_ptr<Model>> models;
 
 	models.push_back(std::make_unique<Model>("objs/floor/floor.obj", glm::mat4(1.0f), glm::vec3(128.0f, 1.f, 128.f), glm::vec3(00.f, 0.f, 00.f)));
-	//models.push_back(std::make_unique<Model>("objs/doughnut2/doughnut2.obj", glm::mat4(1.0f), glm::vec3(50.f, 50.f, 50.f), glm::vec3(00.f, 4.f, 00.f)));
-	models.push_back(std::make_unique<Model>("objs/white_oak/white_oak.obj", glm::mat4(1.0f), glm::vec3(.1f, .1f, .1f), glm::vec3(300.f, 10.f, 300.f)));
-	Water water = Water(glm::mat4(1.0f), 800,800, glm::vec3(1.0,1.0,1.0), glm::vec3(0,-30,0));
+	models.push_back(std::make_unique<Model>("objs/bird/textured_quad.obj", glm::mat4(1.0f), glm::vec3(10.f, 10.f, 10.f), glm::vec3(00.f, 4.f, 00.f)));
+	glm::mat4 model = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0));
+	std::vector<glm::vec3> control_points = {glm::vec3(0,0,0),glm::vec3(3000,3000,3000),glm::vec3(6000,6000,6000),glm::vec3(9000,9000,9000),glm::vec3(0,8000,0) };
+	models.push_back(std::make_unique<Plane>("objs/birb/birb.obj", model, glm::vec3(.05f, .05f, .05f), glm::vec3(00.f, 10.f, 00.f), Spline(control_points)));
+	Water water = Water(glm::mat4(1.0f), 200,200, glm::vec3(1.0,1.0,1.0), glm::vec3(0,-30,0));
 
 	std::cout << "FINISHED PARSING\n";
 
@@ -181,9 +184,9 @@ int main(int argc, char** argv)
 		spot_lights[i].bind_at(i, "spot_lights", shader);
 	}
 
-	DirectionalLight directional_light = DirectionalLight(glm::vec3(-18,42.0f,-21.1f),
-		glm::vec3(0.0f, 0.0f,0.0f),
-		glm::vec3(0.9, 0.9,0.9),
+	DirectionalLight directional_light = DirectionalLight(glm::vec3(18,42.0f,21.1f),
+		glm::vec3(0.2f, 0.2f,0.2f),
+		glm::vec3(0.8, 0.8,0.8),
 		glm::vec3(.4f, .4f,.4));
 
 	directional_light.bind(shader);

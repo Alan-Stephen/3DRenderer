@@ -216,8 +216,7 @@ Model::Model(std::string filename, glm::mat4 model, glm::vec3 scale, glm::vec3 t
 	
 	std::ifstream infile(filename.c_str());
 
-	// check if the file is valid
-//	assert(!infile);
+	assert(infile);
 
 	// iterate through each line in the obj and parse
 	for (std::string line; std::getline(infile, line);) 
@@ -301,7 +300,7 @@ Model::~Model()
 void Model::draw(const Shader& shader) const
 {
 
-	glUniformMatrix4fv(shader.get_uniform_location("model"), 1, GL_FALSE, glm::value_ptr(_model));	
+	glUniformMatrix4fv(shader.get_uniform_location("model"), 1, GL_FALSE, glm::value_ptr(get_model()));	
 	for (const Mesh& mesh : _meshes) {
 		_materials.at(mesh.get_material_ref()).bind(shader);
 		mesh.draw();
