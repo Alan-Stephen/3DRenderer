@@ -36,7 +36,8 @@ glm::vec3 Spline::lerp(float t) const
 
 glm::vec3 Spline::get_direction(float t) const
 {
-	t *= _control_points.size();
+	assert(t >= 0 && t <= 1);
+	t *= _control_points.size() - 1;
 
 	int p0, p1, p2, p3;
 

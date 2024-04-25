@@ -107,7 +107,7 @@ void render_scene(std::vector<std::unique_ptr<Model>> &models, Camera &camera, S
 	glBindTexture(GL_TEXTURE_2D, shadow_map);
 	glUniform1i(shader.get_uniform_location("shadow_map"), 2);
 
-	camera.bind(45, 0.01f, 1000.f, shader, "cameraMat");
+	camera.bind(45, 0.01f, 100000.f, shader, "cameraMat");
 
 	// todo move this into camera.bind
 	glUniform3fv(shader.get_uniform_location("cam_pos"), 1, glm::value_ptr(camera.get_pos()));
@@ -144,9 +144,15 @@ int main(int argc, char** argv)
 
 	models.push_back(std::make_unique<Model>("objs/floor/floor.obj", glm::mat4(1.0f), glm::vec3(128.0f, 1.f, 128.f), glm::vec3(00.f, 0.f, 00.f)));
 	models.push_back(std::make_unique<Model>("objs/bird/textured_quad.obj", glm::mat4(1.0f), glm::vec3(10.f, 10.f, 10.f), glm::vec3(00.f, 4.f, 00.f)));
-	glm::mat4 model = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0));
-	std::vector<glm::vec3> control_points = {glm::vec3(0,0,0),glm::vec3(3000,3000,3000),glm::vec3(6000,6000,6000),glm::vec3(9000,9000,9000),glm::vec3(0,8000,0) };
-	models.push_back(std::make_unique<Plane>("objs/birb/birb.obj", model, glm::vec3(.05f, .05f, .05f), glm::vec3(00.f, 10.f, 00.f), Spline(control_points)));
+	glm::mat4 model = glm::mat4(1.0f);
+	std::vector<glm::vec3> control_points = {
+		glm::vec3(1000,30,1000),
+		glm::vec3(-1000,30,1000),
+		glm::vec3(-1000,30,-1000),
+		glm::vec3(1000,30,-1000),
+		glm::vec3(1000,30,1000),
+	};
+	models.push_back(std::make_unique<Plane>("objs/birb/birb.obj", model, glm::vec3(.1f, .1f, .1f), glm::vec3(00.f, 0.f, 00.f), Spline(control_points)));
 	Water water = Water(glm::mat4(1.0f), 200,200, glm::vec3(1.0,1.0,1.0), glm::vec3(0,-30,0));
 
 	std::cout << "FINISHED PARSING\n";
@@ -249,11 +255,11 @@ int main(int argc, char** argv)
 		render_scene(models, camera, shader, light_projection, shadow_map);
 
 		water_shader.bind();
-		camera.bind(45, 0.01f, 1000.f, water_shader, "cameraMat");
+		camera.bind(45, 0.01f, 100000.f, water_shader, "cameraMat");
 		glUniform3fv(water_shader.get_uniform_location("cam_pos"), 1, glm::value_ptr(camera.get_pos()));
 		water.draw(water_shader);
 
-		skybox.draw(skybox_shader, camera.get_camera_mat(45, 0.01f, 1000.f));
+		skybox.draw(skybox_shader, camera.get_camera_mat(45, 0.01f, 100000.f));
 		//Skybox::draw(skybox_shader, camera.get_camera_mat(45, 0.01, 1000.f));
 
 		glfwSwapBuffers(window);
