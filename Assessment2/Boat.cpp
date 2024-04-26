@@ -15,8 +15,8 @@ Boat::Boat(std::string filename, glm::mat4 model, glm::vec3 scale, glm::vec3 tra
 		glm::vec2(-0.98,0.52)
 	};
 
-    for (float x = 0; x < 7; x += 0.5) {
-        for (float y = 0; y < 7; y += 0.5) {
+    for (float x = -7; x < 7; x += 0.5) {
+        for (float y = -7; y < 7; y += 0.5) {
             _samples.emplace_back(x, 0, y);
         }
     }
