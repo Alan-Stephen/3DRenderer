@@ -3,7 +3,7 @@
 Water::Water(glm::mat4 model, unsigned int height, unsigned int width, glm::vec3 scale, glm::vec3 translate)
 {
 
-    _diffuse = glm::vec4(0.1, 0.5, 1.0, .4);
+    _diffuse = glm::vec4(0.1, 0.5, 1.0, 1.0);
     _specular = glm::vec3(0.1, 0.7, 1.0);
     int shininess = 16;
 

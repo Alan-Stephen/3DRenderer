@@ -26,6 +26,7 @@
 
 #include "Model.h"
 #include "Plane.h"
+#include "Boat.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -143,7 +144,7 @@ int main(int argc, char** argv)
 	std::vector<std::unique_ptr<Model>> models;
 
 	models.push_back(std::make_unique<Model>("objs/floor/floor.obj", glm::mat4(1.0f), glm::vec3(128.0f, 1.f, 128.f), glm::vec3(00.f, 0.f, 00.f)));
-	models.push_back(std::make_unique<Model>("objs/Boat/boat.obj", glm::mat4(1.0f), glm::vec3(3.1f, 3.1f, 3.1f), glm::vec3(200.f, 0.f,200.f)));
+	models.push_back(std::make_unique<Boat>("objs/Boat/boat.obj", glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(200.f, 10.f,200.f)));
 	glm::mat4 model = glm::mat4(1.0f);
 	std::vector<glm::vec3> control_points = {
 		glm::vec3(1000,30,1000),
@@ -153,7 +154,7 @@ int main(int argc, char** argv)
 		glm::vec3(1000,30,1000),
 	};
 	models.push_back(std::make_unique<Plane>("objs/birb/birb.obj", model, glm::vec3(.1f, .1f, .1f), glm::vec3(00.f, 0.f, 00.f), Spline(control_points)));
-	Water water = Water(glm::mat4(1.0f), 400,400, glm::vec3(4.0,4.0,4.0), glm::vec3(0,20,0));
+	Water water = Water(glm::mat4(1.0f), 400,400, glm::vec3(1.0,1.0,1.0), glm::vec3(0,20,0));
 
 	std::cout << "FINISHED PARSING\n";
 
