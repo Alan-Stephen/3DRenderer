@@ -3,11 +3,10 @@
 Water::Water(glm::mat4 model, unsigned int height, unsigned int width, glm::vec3 scale, glm::vec3 translate)
 {
 
-    Texture specular = Texture("", true, RGBA(1.0,1.0,1.0,1.0f));
-    Texture diffuse = Texture("", true, RGBA(.1,.5,1.0,1.0f));
+    _diffuse = glm::vec4(0.1, 0.5, 1.0, .4);
+    _specular = glm::vec3(0.1, 0.7, 1.0);
     int shininess = 16;
 
-    _material = Material(diffuse, specular, diffuse, shininess, "water");
     _model = glm::scale(model, scale);
     _model = glm::translate(_model, translate);
     // Calculate the number of _verts needed
@@ -45,9 +44,13 @@ Water::Water(glm::mat4 model, unsigned int height, unsigned int width, glm::vec3
 		glEnableVertexAttribArray(0);
 }
 
-void Water::draw(Shader& shader)
+void Water::draw(Shader &shader, Camera camera)
 {
-    _material.bind(shader);
+    shader.bind();
+	camera.bind(45, 0.01f, 100000.f, shader, "cameraMat");
+	glUniform3fv(shader.get_uniform_location("cam_pos"), 1, glm::value_ptr(camera.get_pos()));
+    glUniform4fv(shader.get_uniform_location("diffuse"), 1, glm::value_ptr(_diffuse));
+    glUniform3fv(shader.get_uniform_location("specular"), 1, glm::value_ptr(_specular));
     glUniformMatrix4fv(shader.get_uniform_location("model"), 1, GL_FALSE, glm::value_ptr(_model));
     glUniform1f(shader.get_uniform_location("time"), static_cast<float>(glfwGetTime()));
 	glBindVertexArray(_vao);
@@ -57,7 +60,6 @@ void Water::draw(Shader& shader)
 Water::~Water()
 {
     std::cout << "DECONSTRUCTING WATER MESH " << _vao << std::endl;
-    _material.deinit();
 	glDeleteBuffers(1, &_vbo);
 	glDeleteVertexArrays(1, &_vao);
 

@@ -107,7 +107,7 @@ void render_scene(std::vector<std::unique_ptr<Model>> &models, Camera &camera, S
 	glBindTexture(GL_TEXTURE_2D, shadow_map);
 	glUniform1i(shader.get_uniform_location("shadow_map"), 2);
 
-	camera.bind(45, 0.01f, 100000.f, shader, "cameraMat");
+	camera.bind(45, 0.01f, 1000.f, shader, "cameraMat");
 
 	// todo move this into camera.bind
 	glUniform3fv(shader.get_uniform_location("cam_pos"), 1, glm::value_ptr(camera.get_pos()));
@@ -143,7 +143,7 @@ int main(int argc, char** argv)
 	std::vector<std::unique_ptr<Model>> models;
 
 	models.push_back(std::make_unique<Model>("objs/floor/floor.obj", glm::mat4(1.0f), glm::vec3(128.0f, 1.f, 128.f), glm::vec3(00.f, 0.f, 00.f)));
-	models.push_back(std::make_unique<Model>("objs/bird/textured_quad.obj", glm::mat4(1.0f), glm::vec3(10.f, 10.f, 10.f), glm::vec3(00.f, 4.f, 00.f)));
+	models.push_back(std::make_unique<Model>("objs/Boat/boat.obj", glm::mat4(1.0f), glm::vec3(3.1f, 3.1f, 3.1f), glm::vec3(200.f, 0.f,200.f)));
 	glm::mat4 model = glm::mat4(1.0f);
 	std::vector<glm::vec3> control_points = {
 		glm::vec3(1000,30,1000),
@@ -153,7 +153,7 @@ int main(int argc, char** argv)
 		glm::vec3(1000,30,1000),
 	};
 	models.push_back(std::make_unique<Plane>("objs/birb/birb.obj", model, glm::vec3(.1f, .1f, .1f), glm::vec3(00.f, 0.f, 00.f), Spline(control_points)));
-	Water water = Water(glm::mat4(1.0f), 200,200, glm::vec3(1.0,1.0,1.0), glm::vec3(0,-30,0));
+	Water water = Water(glm::mat4(1.0f), 400,400, glm::vec3(4.0,4.0,4.0), glm::vec3(0,20,0));
 
 	std::cout << "FINISHED PARSING\n";
 
@@ -191,7 +191,7 @@ int main(int argc, char** argv)
 	}
 
 	DirectionalLight directional_light = DirectionalLight(glm::vec3(18,42.0f,21.1f),
-		glm::vec3(0.2f, 0.2f,0.2f),
+		glm::vec3(0.4f, 0.4f,0.4f),
 		glm::vec3(0.8, 0.8,0.8),
 		glm::vec3(.4f, .4f,.4));
 
@@ -228,6 +228,9 @@ int main(int argc, char** argv)
 	unsigned int count = 0;
 	while (!glfwWindowShouldClose(window))
 	{
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		// Clean the back buffer and depth buffer
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// calculate fps
 		curr_time = glfwGetTime();
@@ -254,13 +257,12 @@ int main(int argc, char** argv)
 
 		render_scene(models, camera, shader, light_projection, shadow_map);
 
-		water_shader.bind();
-		camera.bind(45, 0.01f, 100000.f, water_shader, "cameraMat");
-		glUniform3fv(water_shader.get_uniform_location("cam_pos"), 1, glm::value_ptr(camera.get_pos()));
-		water.draw(water_shader);
 
 		skybox.draw(skybox_shader, camera.get_camera_mat(45, 0.01f, 100000.f));
 		//Skybox::draw(skybox_shader, camera.get_camera_mat(45, 0.01, 1000.f));
+
+		// IMPORTANT : draw water after everything because it's transparent!!!
+		water.draw(water_shader, camera);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

@@ -7,8 +7,8 @@ uniform vec3 light_pos;
 uniform vec3 light_col;
 uniform vec3 cam_pos;
 
-uniform sampler2D diffuse_tex;
-uniform sampler2D specular_tex;
+uniform vec4 diffuse;
+uniform vec3 specular;
 
 struct DirectionalLight {
     vec3 direction;
@@ -30,10 +30,10 @@ vec3 calculate_direct_light(DirectionalLight light, vec3 normal, vec3 view_direc
     float spec = pow(max(dot(view_direction, reflectDir), 0.0), 8); // shininess a bit too high thoguh
     // combine results
 
-	vec3 diffuse_res = vec3(0.1,0.5,1.0);
+	vec3 diffuse_res = diffuse.rgb;
     vec3 ambient  = light.ambient  * diffuse_res;
     vec3 diffuse  = light.diffuse  * diff * diffuse_res;
-    vec3 specular = light.specular * spec * vec3(.5,.5,.5);
+    vec3 specular = light.specular * spec * specular;
     return (ambient + diffuse + specular);
 }  
 
@@ -45,5 +45,5 @@ void main()
     vec3 view_direction = normalize(cam_pos - pos);
 
 	vec3 result = calculate_direct_light(directional_light, normal, view_direction); 
-    fragColor = vec4(result, 1.0);
+    fragColor = vec4(result, diffuse.a);
 }

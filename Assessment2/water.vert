@@ -41,7 +41,7 @@ vec2 random_dirs[NUM_SUBWAVES]  = vec2[] (
 );
 
 // brownian motion parameters
-float amplitude_brownian = 0.85;
+float amplitude_brownian = 0.70;
 float freq_brownian = 1.13;
 float speed_brownian = 1.1;
 
@@ -57,7 +57,7 @@ void main()
     float prev_y = 0;
     float k = 1.5;
    
-    SubWave wave = SubWave(10.0,.05,1.0, vec2(0.0,0.0));
+    SubWave wave = SubWave(35.0,.05,1.0, vec2(0.0,0.0));
     for (int i = 0; i < NUM_SUBWAVES; ++i) {
             
         // reduce amplitude increase frequency and speed, set to new random direction

@@ -58,6 +58,8 @@ std::vector<std::string> m_split(const std::string &s, const char *delim) {
 int m_mtl_parse(char* filename, std::vector<Material> &mtls)
 {
 	std::ifstream infile(filename);
+
+	assert(infile);
 	
 	// finds prefix for mtl file
 	size_t lastSlashPos = std::string(filename).find_last_of('/');
