@@ -28,6 +28,9 @@ glm::mat4 Camera::get_camera_mat()
 
 void Camera::handleInput(GLFWwindow* window)
 {
+	// y movement shouldn't be affected by orientation only using L-SHIFT and SPACE
+	// like minecraft creative flight.
+
 	glm::vec3 orient_without_y = glm::vec3(_orientation.x, 0.0f, _orientation.z);
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
@@ -49,66 +52,45 @@ void Camera::handleInput(GLFWwindow* window)
 	{
 		_position += _speed * _up;
 	}
-	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 	{
 		_position += _speed * -_up;
 	}
-	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
 	{
-		_speed = 1.4f;
+		_speed = 2.4f;
 	}
-	else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
+	else if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_RELEASE)
 	{
 		_speed = 1.1f;
 	}
 
 
-	// Handles mouse inputs
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+	// handle mouse inputs
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+
+	double mouse_x;
+	double mouse_y;
+
+	glfwGetCursorPos(window, &mouse_x, &mouse_y);
+
+	// normalize mouse coords  to center of screen
+	float rot_x = _sensitivity * (float)(mouse_y - (_height / 2)) / _height;
+	float rot_y = _sensitivity * (float)(mouse_x - (_width / 2)) / _width;
+
+	glm::vec3 new_orientation = glm::rotate(_orientation, glm::radians(-rot_x), glm::normalize(glm::cross(_orientation, _up)));
+
+	// prevents camera from flipping in on itself. 
+	if (abs(glm::angle(new_orientation, _up) - glm::radians(90.0f)) <= glm::radians(85.0f))
 	{
-		// Hides mouse cursor
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-
-		// Prevents camera from jumping on the first click
-		if (_firstClick)
-		{
-			glfwSetCursorPos(window, (_width / 2), (_height / 2));
-			_firstClick = false;
-		}
-
-		// Stores the coordinates of the cursor
-		double mouseX;
-		double mouseY;
-		// Fetches the coordinates of the cursor
-		glfwGetCursorPos(window, &mouseX, &mouseY);
-
-		// Normalizes and shifts the coordinates of the cursor such that they begin in the middle of the screen
-		// and then "transforms" them into degrees 
-		float rotX = _sensitivity * (float)(mouseY - (_height / 2)) / _height;
-		float rotY = _sensitivity * (float)(mouseX - (_width / 2)) / _width;
-
-		glm::vec3 newOrientation = glm::rotate(_orientation, glm::radians(-rotX), glm::normalize(glm::cross(_orientation, _up)));
-
-		// Decides whether or not the next vertical Orientation is legal or not
-		if (abs(glm::angle(newOrientation, _up) - glm::radians(90.0f)) <= glm::radians(85.0f))
-		{
-			_orientation = newOrientation;
-		}
-
-		// Rotates the Orientation left and right
-		_orientation = glm::rotate(_orientation, glm::radians(-rotY), _up);
-
-		// Sets mouse cursor to the middle of the screen so that it doesn't end up roaming around
-		glfwSetCursorPos(window, (_width / 2), (_height / 2));
-	}
-	else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
-	{
-		// Unhides cursor since camera is not looking around anymore
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-		// Makes sure the next time the camera looks around it doesn't jump
-		_firstClick = true;
+		_orientation = new_orientation;
 	}
 
+	// rotates left and right
+	_orientation = glm::rotate(_orientation, glm::radians(-rot_y), _up);
+
+	// reset mouse position to the center
+	glfwSetCursorPos(window, (_width / 2), (_height / 2));
 }
 glm::vec3 Camera::get_pos() const
 {
