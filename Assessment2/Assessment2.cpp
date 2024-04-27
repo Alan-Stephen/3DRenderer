@@ -47,12 +47,24 @@ void SizeCallback(GLFWwindow* window, int w, int h)
 
 
 
-void processKeyboard(GLFWwindow* window)
+void processKeyboard(GLFWwindow* window, Camera *&camera, Camera &normal_camera, BoatCamera &boat_camera, bool &is_normal, double &time_last_called)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
-	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-		return;
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+		if ((glfwGetTime() - time_last_called) > 0.1) {
+			if (is_normal) {
+				camera = &boat_camera;
+				std::cout << "Switching to boat camera\n";
+			}
+			else {
+				camera = &normal_camera;
+				std::cout << "Switching to normal camera\n";
+			}
+			is_normal = !is_normal;
+			time_last_called = glfwGetTime();
+		}
+	}
 }
 
 void set_up_shadow_map(Shader &shadow_shader, unsigned int &shadow_map_fbo, unsigned int &shadow_map, glm::mat4 &light_projection) 
@@ -161,7 +173,7 @@ int main(int argc, char** argv)
 
 	// plane should loop every 10 seconds, rotate it 270.0f intially
 	models.push_back(std::make_unique<Plane>("objs/birb/birb.obj", glm::vec3(.1f, .1f, .1f), glm::vec3(00.f, 0.f, 00.f), Spline(control_points), 10, 270.0f));
-	Water water = Water(400,400, glm::vec3(1.0,1.0,1.0), glm::vec3(0,20,0));
+	Water water = Water(400,400, glm::vec3(4.0,1.0,4.0), glm::vec3(0,20,0));
 
 	std::cout << "FINISHED PARSING\n";
 
@@ -232,11 +244,13 @@ int main(int argc, char** argv)
 	BoatCamera boat_camera = BoatCamera(width, height, glm::vec3(0.0, 0.0, 0.0), boat, 45, 0.01, 1000);
 
 	Camera* camera = &normal_camera;
+	bool is_normal = true;
 
 	double prev_time = 0.0;
 	double curr_time = 0.0;	
 	double diff;
 	unsigned int count = 0;
+	double time_last_called = 0;
 	while (!glfwWindowShouldClose(window))
 	{
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -258,13 +272,12 @@ int main(int argc, char** argv)
 			glfwSetWindowTitle(window, title.c_str());
 			prev_time = curr_time;
 			count = 0;
+
 		}
 
-		processKeyboard(window);
+		processKeyboard(window, camera, normal_camera, boat_camera, is_normal, time_last_called);
+
 		camera->handleInput(window);
-
-
-
 
 		render_shadow_map(shadow_shader, shadow_map_fbo, models);
 
@@ -279,8 +292,6 @@ int main(int argc, char** argv)
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-
-		processKeyboard(window);
 	}
 
 	glfwDestroyWindow(window);

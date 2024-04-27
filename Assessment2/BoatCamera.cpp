@@ -8,7 +8,6 @@ BoatCamera::BoatCamera(int width, int height, glm::vec3 position, Boat &boat, fl
 
 void BoatCamera::handleInput(GLFWwindow * window)
 {
-	std::cout << "processing input here\n";
 	glm::vec3 position = _boat.get_position();
 	glm::vec3 orientation = _boat.get_orientation();
 	glm::vec3 orient_without_y = glm::vec3(_boat.get_orientation().x, 0.0f, _boat.get_orientation().z);
