@@ -1,6 +1,6 @@
 #include "Boat.h"
 
-Boat::Boat(std::string filename, glm::mat4 model, glm::vec3 scale, glm::vec3 translate) : Model(filename, model, scale, translate) 
+Boat::Boat(std::string filename, glm::vec3 scale, glm::vec3 translate) : Model(filename, scale, translate) 
 {
 	// note these have to be the exact same as in water.vert, otherwise the results of get_height will be wrong
 
@@ -24,7 +24,8 @@ Boat::Boat(std::string filename, glm::mat4 model, glm::vec3 scale, glm::vec3 tra
         }
     }
 
-	// brownian motion parameters
+	// brownian motion parameters, these are the exact same as the parameters from water.vert
+    // this has to be done so the height sampling is accurate
 	_amplitude_brownian = 0.70;
 	_frequency_brownian = 1.13;
 	_speed_brownian = 1.1;

@@ -13,8 +13,11 @@ class Plane : public Model
 {
 private:
 	Spline _spline;
+	int _repeat_interval_seconds;
+	float _initial_rotation_degrees;
 public:
-	Plane(std::string filename, glm::mat4 model, glm::vec3 scale, glm::vec3 translate, Spline spline);
+	Plane(std::string filename, glm::vec3 scale, glm::vec3 translate, Spline spline,
+		int repeat_interval_seconds, float initial_rotation_degrees);
 	void set_spline(Spline spline);
 	glm::mat4 get_model() const override;
 };

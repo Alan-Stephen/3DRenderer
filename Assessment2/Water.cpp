@@ -1,13 +1,13 @@
 #include "Water.h"
 
-Water::Water(glm::mat4 model, unsigned int height, unsigned int width, glm::vec3 scale, glm::vec3 translate)
+Water::Water(unsigned int height, unsigned int width, glm::vec3 scale, glm::vec3 translate)
 {
 
     _diffuse = glm::vec4(0.1, 0.5, 1.0, 0.8);
     _specular = glm::vec3(0.1, 0.7, 1.0);
     int shininess = 16;
 
-    _model = glm::scale(model, scale);
+    _model = glm::scale(glm::mat4(1.0f), scale);
     _model = glm::translate(_model, translate);
     // Calculate the number of _verts needed
     int num__verts = height * width * 6; // Each quad has two triangles, each triangle has three _verts

@@ -9,7 +9,7 @@
 class Boat : public Model
 {
 public:
-	Boat(std::string filename, glm::mat4 model, glm::vec3 scale, glm::vec3 translate);
+	Boat(std::string filename, glm::vec3 scale, glm::vec3 translate);
 	glm::mat4 get_model() const override;
 	glm::vec3 get_position() const;
 	glm::vec3 get_orientation() const;

@@ -146,8 +146,8 @@ int main(int argc, char** argv)
 	std::cout << "PARSING OBJECTS\n";
 	std::vector<std::unique_ptr<Model>> models;
 
-	Boat boat = Boat("objs/Boat/boat.obj", glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(200.f, 20.f, 200.f));
-	models.push_back(std::make_unique<Model>("objs/floor/floor.obj", glm::mat4(1.0f), glm::vec3(128.0f, 1.f, 128.f), glm::vec3(00.f, 0.f, 00.f)));
+	Boat boat = Boat("objs/Boat/boat.obj", glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(200.f, 20.f, 200.f));
+	models.push_back(std::make_unique<Model>("objs/floor/floor.obj", glm::vec3(128.0f, 1.f, 128.f), glm::vec3(00.f, 0.f, 00.f)));
 	glm::mat4 model = glm::mat4(1.0f);
 	std::vector<glm::vec3> control_points = {
 		glm::vec3(1000,30,1000),
@@ -157,8 +157,9 @@ int main(int argc, char** argv)
 		glm::vec3(1000,30,1000),
 	};
 
-	models.push_back(std::make_unique<Plane>("objs/birb/birb.obj", model, glm::vec3(.1f, .1f, .1f), glm::vec3(00.f, 0.f, 00.f), Spline(control_points)));
-	Water water = Water(glm::mat4(1.0f), 400,400, glm::vec3(1.0,1.0,1.0), glm::vec3(0,20,0));
+	// plane should loop every 10 seconds, rotate it 270.0f intially
+	models.push_back(std::make_unique<Plane>("objs/birb/birb.obj", glm::vec3(.1f, .1f, .1f), glm::vec3(00.f, 0.f, 00.f), Spline(control_points), 10, 270.0f));
+	Water water = Water(400,400, glm::vec3(1.0,1.0,1.0), glm::vec3(0,20,0));
 
 	std::cout << "FINISHED PARSING\n";
 
@@ -225,7 +226,7 @@ int main(int argc, char** argv)
 
 	shader.bind();
 
-	std::unique_ptr<Camera> camera = std::make_unique<BoatCamera>(width, height, glm::vec3(0.0, 0.0, 0.0), boat);
+	std::unique_ptr<Camera> camera = std::make_unique<Camera>(width, height, glm::vec3(0.0, 0.0, 0.0));
 
 	double prev_time = 0.0;
 	double curr_time = 0.0;	
