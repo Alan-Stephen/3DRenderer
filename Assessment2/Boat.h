@@ -25,7 +25,7 @@ private:
 	int _num_subwaves;
 	glm::vec3 _position;
 	glm::vec3 _orientation;
-	float _base_y;
+	const float _base_y;
 	std::vector<glm::vec3> _samples;
 
 	float get_height(float timeSecs, glm::vec3 position) const;

@@ -47,7 +47,7 @@ Water::Water(unsigned int height, unsigned int width, glm::vec3 scale, glm::vec3
 void Water::draw(Shader &shader, const Camera *camera)
 {
     shader.bind();
-	camera->bind(45, 0.01f, 100000.f, shader, "cameraMat");
+	camera->bind(shader, "cameraMat");
 	glUniform3fv(shader.get_uniform_location("cam_pos"), 1, glm::value_ptr(camera->get_pos()));
     glUniform4fv(shader.get_uniform_location("diffuse"), 1, glm::value_ptr(_diffuse));
     glUniform3fv(shader.get_uniform_location("specular"), 1, glm::value_ptr(_specular));

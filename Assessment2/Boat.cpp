@@ -1,6 +1,8 @@
 #include "Boat.h"
+#include <iostream>
+#include "glm/gtx/string_cast.hpp"
 
-Boat::Boat(std::string filename, glm::vec3 scale, glm::vec3 translate) : Model(filename, scale, translate) 
+Boat::Boat(std::string filename, glm::vec3 scale, glm::vec3 translate) : Model(filename, scale, translate), _base_y(translate.y)
 {
 	// note these have to be the exact same as in water.vert, otherwise the results of get_height will be wrong
 
@@ -18,20 +20,19 @@ Boat::Boat(std::string filename, glm::vec3 scale, glm::vec3 translate) : Model(f
 		glm::vec2(-0.98,0.52)
 	};
 
-    for (float x = -7; x < 7; x += 0.5) {
-        for (float y = -7; y < 7; y += 0.5) {
+    for (float x = -7; x < 7; x += 0.5f) {
+        for (float y = -7; y < 7; y += 0.5f) {
             _samples.emplace_back(x, 0, y);
         }
     }
 
 	// brownian motion parameters, these are the exact same as the parameters from water.vert
     // this has to be done so the height sampling is accurate
-	_amplitude_brownian = 0.70;
-	_frequency_brownian = 1.13;
-	_speed_brownian = 1.1;
+	_amplitude_brownian = 0.70f;
+	_frequency_brownian = 1.13f;
+	_speed_brownian = 1.1f;
     _num_subwaves = 8;
     _position = translate;
-    _base_y = translate.y;
     _orientation = glm::vec3(0, 0, 1);
 }
 
@@ -39,13 +40,14 @@ glm::mat4 Boat::get_model() const
 {
     // pick out the max y of the waves in sample radius.
     // todo: maybe make them rotate?
+    glm::mat4 res = glm::mat4(1.0f);
     glm::vec3 movement = _position;
 
     movement.y = get_max_height(glfwGetTime(), _position);
 
-    glm::mat4 res = glm::translate(_model, glm::vec3(0,0,0));
-    glm::mat4 rotation = glm::inverse(glm::lookAt(movement, movement +  _orientation, glm::vec3(0.0, 1.0, 0.0)));
-    
+    // look at matrix also applies translation as well as rotation
+    glm::mat4 rotation = glm::inverse(glm::lookAt(movement, movement + _orientation, glm::vec3(0.0, 1.0, 0.0)));
+
     return res * rotation;
 }
 

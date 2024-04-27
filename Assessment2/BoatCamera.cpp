@@ -1,7 +1,8 @@
 #include "BoatCamera.h"
 #include <iostream>
 
-BoatCamera::BoatCamera(int width, int height, glm::vec3 position, Boat& boat) : Camera(width, height, position), _boat(boat)
+BoatCamera::BoatCamera(int width, int height, glm::vec3 position, Boat &boat, float fov, float near_plane, float far_plane) : 
+	Camera(width, height, position, fov, near_plane, far_plane), _boat(boat)
 {
 }
 
@@ -54,7 +55,7 @@ glm::vec3 BoatCamera::get_pos() const
 	return pos;
 }
 
-glm::mat4 BoatCamera::get_camera_mat(float fov, float nearPlane, float farPlane)
+glm::mat4 BoatCamera::get_camera_mat()
 {
 	glm::mat4 view = glm::mat4(1.0f);
 	glm::mat4 projection = glm::mat4(1.0f);
@@ -62,13 +63,13 @@ glm::mat4 BoatCamera::get_camera_mat(float fov, float nearPlane, float farPlane)
 	glm::vec3 pos = get_pos();
 
 	view = glm::lookAt(pos, pos + _boat.get_orientation(), _up);
-	projection = glm::perspective(glm::radians(fov), (float)(_width / _height), nearPlane, farPlane);
+	projection = glm::perspective(glm::radians(_fov), (float)(_width / _height), _near_plane, _far_plane);
 
 	return projection * view;
 
 }
 
-void BoatCamera::bind(float fov, float nearPlane, float farPlane, Shader& shader, std::string uniform) const
+void BoatCamera::bind(Shader& shader, std::string uniform) const
 {
 	glm::mat4 view = glm::mat4(1.0f);
 	glm::mat4 projection = glm::mat4(1.0f);
@@ -81,7 +82,7 @@ void BoatCamera::bind(float fov, float nearPlane, float farPlane, Shader& shader
 	// emulating the 3rd person camera effect.
 	orient.y = -0.1;
 	view = glm::lookAt(pos, pos + orient, _up);
-	projection = glm::perspective(glm::radians(fov), (float)(_width / _height), nearPlane, farPlane);
+	projection = glm::perspective(glm::radians(_fov), (float)(_width / _height), _near_plane, _far_plane);
 
 	glUniformMatrix4fv(shader.get_uniform_location(uniform),1, GL_FALSE, glm::value_ptr(projection * view));
 }

@@ -1,27 +1,27 @@
 #include "Camera.h"
 
-Camera::Camera(int width, int height, glm::vec3 position) : 
-	_width(width), _height(height), _position(position)
+Camera::Camera(int width, int height, glm::vec3 position, float fov, float near_plane, float far_plane) : 
+	_width(width), _height(height), _position(position), _fov(fov), _near_plane(near_plane), _far_plane(far_plane)
 {}
 
-void Camera::bind(float fov, float nearPlane, float farPlane, Shader& shader, std::string uniform) const
+void Camera::bind(Shader &shader,std::string uniform) const
 {
 	glm::mat4 view = glm::mat4(1.0f);
 	glm::mat4 projection = glm::mat4(1.0f);
 
 	view = glm::lookAt(_position, _position + _orientation, _up);
-	projection = glm::perspective(glm::radians(fov), (float)(_width / _height), nearPlane, farPlane);
+	projection = glm::perspective(glm::radians(_fov), (float)(_width / _height), _near_plane, _far_plane);
 
 	glUniformMatrix4fv(shader.get_uniform_location(uniform),1, GL_FALSE, glm::value_ptr(projection * view));
 }
 
-glm::mat4 Camera::get_camera_mat(float fov, float nearPlane, float farPlane)
+glm::mat4 Camera::get_camera_mat()
 {
 	glm::mat4 view = glm::mat4(1.0f);
 	glm::mat4 projection = glm::mat4(1.0f);
 
 	view = glm::lookAt(_position, _position + _orientation, _up);
-	projection = glm::perspective(glm::radians(fov), (float)(_width / _height), nearPlane, farPlane);
+	projection = glm::perspective(glm::radians(_fov), (float)(_width / _height), _near_plane, _far_plane);
 
 	return projection * view;
 }

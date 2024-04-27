@@ -51,6 +51,8 @@ void processKeyboard(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+		return;
 }
 
 void set_up_shadow_map(Shader &shadow_shader, unsigned int &shadow_map_fbo, unsigned int &shadow_map, glm::mat4 &light_projection) 
@@ -109,7 +111,7 @@ void render_scene(std::vector<std::unique_ptr<Model>> &models, const Camera *cam
 	glBindTexture(GL_TEXTURE_2D, shadow_map);
 	glUniform1i(shader.get_uniform_location("shadow_map"), 2);
 
-	camera->bind(45, 0.01f, 1000.f, shader, "cameraMat");
+	camera->bind(shader, "cameraMat");
 
 	// todo move this into camera.bind
 	glUniform3fv(shader.get_uniform_location("cam_pos"), 1, glm::value_ptr(camera->get_pos()));
@@ -226,7 +228,10 @@ int main(int argc, char** argv)
 
 	shader.bind();
 
-	std::unique_ptr<Camera> camera = std::make_unique<Camera>(width, height, glm::vec3(0.0, 0.0, 0.0));
+	Camera normal_camera = Camera(width, height, glm::vec3(0.0, 0.0, 0.0), 45, 0.01, 1000);
+	BoatCamera boat_camera = BoatCamera(width, height, glm::vec3(0.0, 0.0, 0.0), boat, 45, 0.01, 1000);
+
+	Camera* camera = &normal_camera;
 
 	double prev_time = 0.0;
 	double curr_time = 0.0;	
@@ -246,9 +251,9 @@ int main(int argc, char** argv)
 		if (diff >= (1.0 / 2.0)) {
 			std::string fps = std::to_string((1 / diff) * count);
 			std::string frame_time = std::to_string((diff / count) * 1000);
-			std::string position = std::to_string(camera.get()->get_pos().x) + "," +
-				std::to_string(camera.get()->get_pos().y) +
-				"," + std::to_string(camera.get()->get_pos().z);
+			std::string position = std::to_string(camera->get_pos().x) + "," +
+				std::to_string(camera->get_pos().y) +
+				"," + std::to_string(camera->get_pos().z);
 			std::string title = fps + " / " + frame_time + " ms" + "/ position: " + position;
 			glfwSetWindowTitle(window, title.c_str());
 			prev_time = curr_time;
@@ -263,14 +268,14 @@ int main(int argc, char** argv)
 
 		render_shadow_map(shadow_shader, shadow_map_fbo, models);
 
-		render_scene(models, camera.get(), shader, light_projection, shadow_map, boat);
+		render_scene(models, camera, shader, light_projection, shadow_map, boat);
 
 
-		skybox.draw(skybox_shader, camera->get_camera_mat(45, 0.01f, 100000.f));
+		skybox.draw(skybox_shader, camera->get_camera_mat());
 		//Skybox::draw(skybox_shader, camera.get_camera_mat(45, 0.01, 1000.f));
 
 		// IMPORTANT : draw water after everything because it's transparent!!!
-		water.draw(water_shader, camera.get());
+		water.draw(water_shader, camera);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

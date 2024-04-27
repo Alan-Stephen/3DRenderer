@@ -14,8 +14,6 @@
 class Camera
 {
 public:
-	int _height;
-	int _width;
 
 	float _speed = 0.5f;
 	float _sensitivity = 100.f;
@@ -23,15 +21,20 @@ public:
 
 	bool _firstClick = true;
 
-	Camera(int width, int height, glm::vec3 position);
+	Camera(int width, int height, glm::vec3 position, float fov, float near_plane, float farPlane);
 
-	virtual void bind(float fov, float nearPlane, float farPlane, Shader& shader, std::string uniform) const;
-	virtual glm::mat4 get_camera_mat(float fov, float nearPlane, float farPlane);
+	virtual void bind(Shader& shader, std::string uniform) const;
+	virtual glm::mat4 get_camera_mat();
 	virtual void handleInput(GLFWwindow* window);
 	virtual glm::vec3 get_pos() const;
 private:
 	glm::vec3 _position;
 	glm::vec3 _orientation = glm::vec3(0.0f,0.0f,1.0f);
-
+protected:
+	float _fov;
+	float _near_plane;
+	float _far_plane;
+	int _height;
+	int _width;
 };
 
