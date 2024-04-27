@@ -15,7 +15,7 @@ class Water
 public:
 	// width and height are for vertiices, scale is for size.
 	Water(glm::mat4 model, unsigned int height, unsigned int width, glm::vec3 scale, glm::vec3 translate);
-	void draw(Shader &shader, Camera camera);
+	void draw(Shader &shader, const Camera *camera);
 	~Water();
 	glm::mat4 get_model();
 private:

@@ -4,7 +4,7 @@ Camera::Camera(int width, int height, glm::vec3 position) :
 	_width(width), _height(height), _position(position)
 {}
 
-void Camera::bind(float fov, float nearPlane, float farPlane, Shader& shader, std::string uniform)
+void Camera::bind(float fov, float nearPlane, float farPlane, Shader& shader, std::string uniform) const
 {
 	glm::mat4 view = glm::mat4(1.0f);
 	glm::mat4 projection = glm::mat4(1.0f);

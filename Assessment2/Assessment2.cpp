@@ -27,6 +27,7 @@
 #include "Model.h"
 #include "Plane.h"
 #include "Boat.h"
+#include "BoatCamera.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -93,7 +94,7 @@ void render_shadow_map(Shader &shadow_shader, unsigned int shadow_map_fbo, std::
 		}	
 }
 
-void render_scene(std::vector<std::unique_ptr<Model>> &models, Camera &camera, Shader &shader, glm::mat4 &light_projection, unsigned int shadow_map) 
+void render_scene(std::vector<std::unique_ptr<Model>> &models, const Camera *camera, Shader &shader, glm::mat4 &light_projection, unsigned int shadow_map, const Boat &boat) 
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, width, height);
@@ -108,14 +109,16 @@ void render_scene(std::vector<std::unique_ptr<Model>> &models, Camera &camera, S
 	glBindTexture(GL_TEXTURE_2D, shadow_map);
 	glUniform1i(shader.get_uniform_location("shadow_map"), 2);
 
-	camera.bind(45, 0.01f, 1000.f, shader, "cameraMat");
+	camera->bind(45, 0.01f, 1000.f, shader, "cameraMat");
 
 	// todo move this into camera.bind
-	glUniform3fv(shader.get_uniform_location("cam_pos"), 1, glm::value_ptr(camera.get_pos()));
+	glUniform3fv(shader.get_uniform_location("cam_pos"), 1, glm::value_ptr(camera->get_pos()));
 
 	for(int i = 0; i < models.size(); i++) {
 		models.at(i).get()->draw(shader);
 	}
+
+	boat.draw(shader);
 
 	glBindVertexArray(0);
 }
@@ -143,8 +146,8 @@ int main(int argc, char** argv)
 	std::cout << "PARSING OBJECTS\n";
 	std::vector<std::unique_ptr<Model>> models;
 
+	Boat boat = Boat("objs/Boat/boat.obj", glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(200.f, 20.f, 200.f));
 	models.push_back(std::make_unique<Model>("objs/floor/floor.obj", glm::mat4(1.0f), glm::vec3(128.0f, 1.f, 128.f), glm::vec3(00.f, 0.f, 00.f)));
-	models.push_back(std::make_unique<Boat>("objs/Boat/boat.obj", glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(200.f, 10.f,200.f)));
 	glm::mat4 model = glm::mat4(1.0f);
 	std::vector<glm::vec3> control_points = {
 		glm::vec3(1000,30,1000),
@@ -153,6 +156,7 @@ int main(int argc, char** argv)
 		glm::vec3(1000,30,-1000),
 		glm::vec3(1000,30,1000),
 	};
+
 	models.push_back(std::make_unique<Plane>("objs/birb/birb.obj", model, glm::vec3(.1f, .1f, .1f), glm::vec3(00.f, 0.f, 00.f), Spline(control_points)));
 	Water water = Water(glm::mat4(1.0f), 400,400, glm::vec3(1.0,1.0,1.0), glm::vec3(0,20,0));
 
@@ -221,7 +225,7 @@ int main(int argc, char** argv)
 
 	shader.bind();
 
-	Camera camera = Camera(width, height, glm::vec3(0.0, 0.0, 0.0));
+	std::unique_ptr<Camera> camera = std::make_unique<BoatCamera>(width, height, glm::vec3(0.0, 0.0, 0.0), boat);
 
 	double prev_time = 0.0;
 	double curr_time = 0.0;	
@@ -241,7 +245,9 @@ int main(int argc, char** argv)
 		if (diff >= (1.0 / 2.0)) {
 			std::string fps = std::to_string((1 / diff) * count);
 			std::string frame_time = std::to_string((diff / count) * 1000);
-			std::string position = std::to_string(camera.get_pos().x) + "," + std::to_string(camera.get_pos().y) + "," + std::to_string(camera.get_pos().z);
+			std::string position = std::to_string(camera.get()->get_pos().x) + "," +
+				std::to_string(camera.get()->get_pos().y) +
+				"," + std::to_string(camera.get()->get_pos().z);
 			std::string title = fps + " / " + frame_time + " ms" + "/ position: " + position;
 			glfwSetWindowTitle(window, title.c_str());
 			prev_time = curr_time;
@@ -249,21 +255,21 @@ int main(int argc, char** argv)
 		}
 
 		processKeyboard(window);
-		camera.handleInput(window);
+		camera->handleInput(window);
 
 
 
 
 		render_shadow_map(shadow_shader, shadow_map_fbo, models);
 
-		render_scene(models, camera, shader, light_projection, shadow_map);
+		render_scene(models, camera.get(), shader, light_projection, shadow_map, boat);
 
 
-		skybox.draw(skybox_shader, camera.get_camera_mat(45, 0.01f, 100000.f));
+		skybox.draw(skybox_shader, camera->get_camera_mat(45, 0.01f, 100000.f));
 		//Skybox::draw(skybox_shader, camera.get_camera_mat(45, 0.01, 1000.f));
 
 		// IMPORTANT : draw water after everything because it's transparent!!!
-		water.draw(water_shader, camera);
+		water.draw(water_shader, camera.get());
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

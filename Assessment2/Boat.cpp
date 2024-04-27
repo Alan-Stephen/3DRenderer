@@ -4,6 +4,9 @@ Boat::Boat(std::string filename, glm::mat4 model, glm::vec3 scale, glm::vec3 tra
 {
 	// note these have to be the exact same as in water.vert, otherwise the results of get_height will be wrong
 
+    // reverse the translatoin from the base class constructor
+    _model = glm::scale(glm::mat4(1.0f), scale);
+
     _random_dirs = {
 		glm::vec2(0.56,0.02),
 		glm::vec2(-0.8,0.88),
@@ -26,24 +29,57 @@ Boat::Boat(std::string filename, glm::mat4 model, glm::vec3 scale, glm::vec3 tra
 	_frequency_brownian = 1.13;
 	_speed_brownian = 1.1;
     _num_subwaves = 8;
-    _position = glm::vec3(translate.x, translate.y, translate.z);
+    _position = translate;
     _base_y = translate.y;
+    _orientation = glm::vec3(0, 0, 1);
 }
 
 glm::mat4 Boat::get_model() const
 {
     // pick out the max y of the waves in sample radius.
     // todo: maybe make them rotate?
-    glm::vec3 movement = glm::vec3(0,0,0);
+    glm::vec3 movement = _position;
+
+    movement.y = get_max_height(glfwGetTime(), _position);
+
+    glm::mat4 res = glm::translate(_model, glm::vec3(0,0,0));
+    glm::mat4 rotation = glm::inverse(glm::lookAt(movement, movement +  _orientation, glm::vec3(0.0, 1.0, 0.0)));
+    
+    return res * rotation;
+}
+
+glm::vec3 Boat::get_orientation() const
+{
+    return _orientation;
+}
+
+void Boat::set_orientation(glm::vec3 orientation)
+{
+    _orientation = orientation;
+}
+
+void Boat::set_position(glm::vec3 position)
+{
+    _position = position;
+}
+
+glm::vec3 Boat::get_position() const
+{
+    return _position;
+}
+
+float Boat::get_max_height(double timeSecs, glm::vec3 position) const
+{
     float max_y = FLT_MIN;
 
     for (const glm::vec3& sample : _samples) {
-        glm::vec3 curr_position = _position + sample;
-        max_y = max(get_height(static_cast<float>(glfwGetTime()), curr_position),max_y );
+        glm::vec3 curr_position = position + sample;
+        max_y = max(get_height(static_cast<float>(timeSecs), curr_position),max_y );
     }
 
-    movement.y = max_y;
-    return glm::translate(_model, movement);
+    assert(max_y != FLT_MIN);
+
+    return max_y;
 }
 
 float Boat::get_height(float timeSecs, glm::vec3 pos) const
