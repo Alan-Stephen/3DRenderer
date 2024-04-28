@@ -96,7 +96,7 @@ void set_up_shadow_map(Shader &shadow_shader, unsigned int &shadow_map_fbo, unsi
 	shadow_shader.bind();
 	glUniformMatrix4fv(shadow_shader.get_uniform_location("light_projection"), 1, GL_FALSE, glm::value_ptr(light_projection));
 }
-void render_shadow_map(Shader &shadow_shader, unsigned int shadow_map_fbo, std::vector<std::unique_ptr<Model>> &models) {
+void render_shadow_map(Shader &shadow_shader, unsigned int shadow_map_fbo, std::vector<std::unique_ptr<Model>> &models, const Boat &boat) {
 		shadow_shader.bind();
 		glEnable(GL_DEPTH_TEST);
 		glViewport(0, 0, shadow_width, shadow_height);
@@ -106,6 +106,7 @@ void render_shadow_map(Shader &shadow_shader, unsigned int shadow_map_fbo, std::
 		for(int i = 0; i < models.size(); i++) {
 			models.at(i).get()->draw(shadow_shader);
 		}	
+		boat.draw(shadow_shader);
 }
 
 void render_scene(std::vector<std::unique_ptr<Model>> &models, const Camera *camera, Shader &shader, glm::mat4 &light_projection, unsigned int shadow_map, const Boat &boat) 
@@ -306,7 +307,7 @@ int main(int argc, char** argv)
 
 		camera->handleInput(window);
 
-		render_shadow_map(shadow_shader, shadow_map_fbo, models);
+		render_shadow_map(shadow_shader, shadow_map_fbo, models, boat);
 
 		render_scene(models, camera, shader, light_projection, shadow_map, boat);
 
