@@ -32,12 +32,12 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-#define NUM_POINT_LIGHTS 4
-#define NUM_SPOT_LIGHTS 4
+#define NUM_POINT_LIGHTS 2
+#define NUM_SPOT_LIGHTS 2
 const int width = 1200;
 const int height = 800;
-unsigned int shadow_width = 2028;
-unsigned int shadow_height = 2028;
+unsigned int shadow_width = 2048;
+unsigned int shadow_height = 2048;
 
 
 void SizeCallback(GLFWwindow* window, int w, int h)
@@ -90,7 +90,7 @@ void set_up_shadow_map(Shader &shadow_shader, unsigned int &shadow_map_fbo, unsi
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	glm::mat4 orthogonal_projection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 1000.0f);
-	glm::mat4 light_view = glm::lookAt(500.f * glm::vec3(-.18, 0.42, -0.22), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.0f, 0.f));
+	glm::mat4 light_view = glm::lookAt(900.f * glm::vec3(-.18, 0.42, -0.22), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.0f, 0.f));
 	light_projection = orthogonal_projection * light_view;
 
 	shadow_shader.bind();
@@ -160,20 +160,21 @@ int main(int argc, char** argv)
 	std::cout << "PARSING OBJECTS\n";
 	std::vector<std::unique_ptr<Model>> models;
 
-	Boat boat = Boat("objs/Boat/boat.obj", glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(200.f, 20.f, 200.f));
-	models.push_back(std::make_unique<Model>("objs/floor/floor.obj", glm::vec3(128.0f, 1.f, 128.f), glm::vec3(00.f, 0.f, 00.f)));
+	Boat boat = Boat("objs/Boat/boat.obj", glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.f, 0.f, 100.f));
+	models.push_back(std::make_unique<Model>("objs/house/house.obj", glm::vec3(10.0f, 10.f, 10.f), glm::vec3(00.f, 45.f, 00.f)));
 	glm::mat4 model = glm::mat4(1.0f);
 	std::vector<glm::vec3> control_points = {
-		glm::vec3(1000,30,1000),
-		glm::vec3(-1000,30,1000),
-		glm::vec3(-1000,30,-1000),
-		glm::vec3(1000,30,-1000),
-		glm::vec3(1000,30,1000),
+		glm::vec3(4000,30,4000),
+		glm::vec3(-4000,30,4000),
+		glm::vec3(-4000,30,-4000),
+		glm::vec3(4000,30,-4000),
+		glm::vec3(4000,30,4000),
 	};
 
-	// plane should loop every 10 seconds, rotate it 270.0f intially
+	// plane should loop every 10 seconds, rotate it 270.0f intially, otherwise it'll be facing the wrong direction
 	models.push_back(std::make_unique<Plane>("objs/birb/birb.obj", glm::vec3(.1f, .1f, .1f), glm::vec3(00.f, 0.f, 00.f), Spline(control_points), 10, 270.0f));
-	Water water = Water(400,400, glm::vec3(4.0,1.0,4.0), glm::vec3(0,20,0));
+
+	Water water = Water(400,400, glm::vec3(4.0,1.0,4.0), glm::vec3(-200,0,-200));
 
 	std::cout << "FINISHED PARSING\n";
 
@@ -181,38 +182,60 @@ int main(int argc, char** argv)
 
 	// set up lighting in scene
 	PointLight point_lights[NUM_POINT_LIGHTS];
-	for (int i = 0; i < NUM_POINT_LIGHTS; i++) {
-		point_lights[i] = PointLight(
-			glm::vec3(0.0f + (i * 50), 10.f, 0.f + (i * 50)),
-			glm::vec3(1.0f, 1.f, 1.f),
-			glm::vec3(1.0f, 1.f, 1.f),
-			glm::vec3(0.f, 0.f, 0.f),
-			1.0f,
-			0.1f,
-			0.01f
-		);
 
-		point_lights[i].bind_at(i, "point_lights", shader);
-	}
+	point_lights[0] = PointLight(
+		glm::vec3(-6.0f, 52.f, 21.f),
+		glm::vec3(1.0f, .5f, .5f),
+		glm::vec3(1.0f, .5f, .5f),
+		glm::vec3(0.f, 0.f, 0.f),
+		.5f,
+		.1f,
+		0.01f
+	);
 
+	point_lights[0].bind_at(0, "point_lights", shader);
+
+	point_lights[1] = PointLight(
+		glm::vec3(7.0f, 52.f, 21.f),
+		glm::vec3(1.0f, .5f, .5f),
+		glm::vec3(1.0f, .5f, .5f),
+		glm::vec3(0.f, 0.f, 0.f),
+		.5f,
+		.1f,
+		0.01f
+	);
+
+	point_lights[1].bind_at(1, "point_lights", shader);
+
+	// set up spot lights
 	SpotLight spot_lights[NUM_POINT_LIGHTS];
-	for (int i = 0; i < NUM_SPOT_LIGHTS; i++) {
-		spot_lights[i] = SpotLight(
-			glm::vec3(-10.0f + (i * -50), 3.f, 0.f),
-			glm::vec3(0.0f, 1.f, 0.f),
-			glm::vec3(0.0f, 0.f, 0.f),
-			glm::vec3(1.0f, 1.f, 1.f),
-			glm::vec3(1.0f, 1.f, 1.f),
-			0.95,
-			0.90
-		);
+	spot_lights[0] = SpotLight(
+		glm::vec3(0.0f, 60.f, 8.f),
+		glm::vec3(0.0f, 1.f, 0.f),
+		glm::vec3(0.0f, 0.f, 0.f),
+		glm::vec3(1.0f, 1.f, 1.f),
+		glm::vec3(1.0f, 1.f, 1.f),
+		0.98,
+		0.90
+	);
 
-		spot_lights[i].bind_at(i, "spot_lights", shader);
-	}
+	spot_lights[0].bind_at(0, "spot_lights", shader);
+
+	spot_lights[1] = SpotLight(
+		glm::vec3(-1.0f, 62.f, -9.f),
+		glm::vec3(0.0f, 1.f, 0.f),
+		glm::vec3(0.0f, 0.f, 0.f),
+		glm::vec3(1.0f, 1.f, 1.f),
+		glm::vec3(1.0f, 1.f, 1.f),
+		0.98,
+		0.90
+	);
+
+	spot_lights[1].bind_at(1, "spot_lights", shader);
 
 	DirectionalLight directional_light = DirectionalLight(glm::vec3(18,42.0f,21.1f),
-		glm::vec3(0.4f, 0.4f,0.4f),
-		glm::vec3(0.8, 0.8,0.8),
+		glm::vec3(0.1f, 0.1f,0.1f),
+		glm::vec3(0.4, 0.4,0.4),
 		glm::vec3(.4f, .4f,.4));
 
 	directional_light.bind(shader);
@@ -240,8 +263,8 @@ int main(int argc, char** argv)
 
 	shader.bind();
 
-	Camera normal_camera = Camera(width, height, glm::vec3(0.0, 0.0, 0.0), 45, 0.01, 1000);
-	BoatCamera boat_camera = BoatCamera(width, height, glm::vec3(0.0, 0.0, 0.0), boat, 45, 0.01, 1000);
+	Camera normal_camera = Camera(width, height, glm::vec3(0.0, 0.0, 0.0), 45, 0.01, 5000);
+	BoatCamera boat_camera = BoatCamera(width, height, glm::vec3(0.0, 0.0, 0.0), boat, 45, 0.01, 5000);
 
 	Camera* camera = &normal_camera;
 	bool is_normal = true;

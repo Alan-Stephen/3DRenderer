@@ -40,7 +40,7 @@ glm::mat4 Boat::get_model() const
 {
     // pick out the max y of the waves in sample radius.
     // todo: maybe make them rotate?
-    glm::mat4 res = glm::mat4(1.0f);
+    glm::mat4 res = _model;
     glm::vec3 movement = _position;
 
     movement.y = get_max_height(glfwGetTime(), _position);

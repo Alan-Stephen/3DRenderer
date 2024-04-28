@@ -198,8 +198,8 @@ Vertex m_create_vertex_from_indicies(const std::string &indicies, const std::vec
 }
 Model::Model(std::string filename, glm::vec3 scale, glm::vec3 translate)
 {
-	_model = glm::scale(glm::mat4(1.0f), scale);
-	_model = glm::translate(_model, translate);
+	_model = glm::translate(glm::mat4(1.0f), translate);
+	_model = glm::scale(_model, scale);
 	std::unordered_map<std::string, int> name_to_index;
 
 	std::vector<glm::vec3> vecs;
