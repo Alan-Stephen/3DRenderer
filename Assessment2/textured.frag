@@ -74,7 +74,7 @@ vec3 calculate_direct_light(DirectionalLight light, vec3 normal, vec3 view_direc
         float closest_depth;
         float current_depth = light_coords.z;
 
-        float bias = max(0.05 * (1 - dot(normal,lightDir)), 0.00005);
+        float bias = max(0.005 * (1 - dot(normal,lightDir)), 0.00005);
         int sampleRadius = 4;
 
 		vec2 pixelSize = 1.0 / textureSize(shadow_map, 0);

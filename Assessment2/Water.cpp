@@ -2,9 +2,12 @@
 
 Water::Water(unsigned int height, unsigned int width, glm::vec3 scale, glm::vec3 translate)
 {
+    Texture ambient = Texture("", true, RGBA(0.0, 1.0, 0.0, 0.8));
+    Texture diffuse = Texture("objs/water/water_diffuse.jpg", false, RGBA(0.0, 1.0, 0.0, 0.8));
+    Texture specular = Texture("objs/water/water_specular.jpg", false, RGBA(0.0, 1.0, 0.0, 0.8));
 
-    _diffuse = glm::vec4(0.1, 0.5, 1.0, 0.8);
-    _specular = glm::vec3(0.1, 0.7, 1.0);
+    _material = Material(ambient, specular, diffuse, 8, "WATER_MATERIAL");
+
     int shininess = 16;
 
     _model = glm::scale(glm::mat4(1.0f), scale);
@@ -44,15 +47,18 @@ Water::Water(unsigned int height, unsigned int width, glm::vec3 scale, glm::vec3
 		glEnableVertexAttribArray(0);
 }
 
-void Water::draw(Shader &shader, const Camera *camera)
+void Water::draw(Shader &shader, const Camera *camera, glm::mat4 light_projection, unsigned int shadow_map)
 {
     shader.bind();
 	camera->bind(shader, "cameraMat");
+    _material.bind(shader);
 	glUniform3fv(shader.get_uniform_location("cam_pos"), 1, glm::value_ptr(camera->get_pos()));
-    glUniform4fv(shader.get_uniform_location("diffuse"), 1, glm::value_ptr(_diffuse));
-    glUniform3fv(shader.get_uniform_location("specular"), 1, glm::value_ptr(_specular));
     glUniformMatrix4fv(shader.get_uniform_location("model"), 1, GL_FALSE, glm::value_ptr(_model));
     glUniform1f(shader.get_uniform_location("time"), static_cast<float>(glfwGetTime()));
+	glUniformMatrix4fv(shader.get_uniform_location("light_projection"), 1, GL_FALSE, glm::value_ptr(light_projection));
+	glActiveTexture(GL_TEXTURE0 + 2);
+	glBindTexture(GL_TEXTURE_2D, shadow_map);
+	glUniform1i(shader.get_uniform_location("shadow_map"), 2);
 	glBindVertexArray(_vao);
 	glDrawArrays(GL_TRIANGLES, 0, _verts.size());
 }

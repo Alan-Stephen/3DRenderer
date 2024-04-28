@@ -11,8 +11,10 @@ uniform mat4 light_projection;
 
 uniform float time;
 
-out vec3 pos;
+out vec2 tex;
 out vec3 norm;
+out vec3 pos;
+out vec4 frag_pos_light;
 
 struct SubWave {
     float amplitude;
@@ -85,6 +87,8 @@ void main()
 
     // it looks different to the formula in GPU gems because they use weird (x,z,y) format idk why
     norm = normalize(vec3(-ddx, 1, -ddz));
+	frag_pos_light = light_projection * vec4(pos, 1.0f);
+    tex = vec2(0.0,0.0);
     // Transform the position to camera space and set gl_Position
     gl_Position = cameraMat * vec4(pos, 1f);
 }

@@ -90,7 +90,7 @@ void set_up_shadow_map(Shader &shadow_shader, unsigned int &shadow_map_fbo, unsi
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	glm::mat4 orthogonal_projection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 1000.0f);
-	glm::mat4 light_view = glm::lookAt(900.f * glm::vec3(-.18, 0.42, -0.22), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.0f, 0.f));
+	glm::mat4 light_view = glm::lookAt(900.f * glm::vec3(.18, 0.42, 0.22), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.0f, 0.f));
 	light_projection = orthogonal_projection * light_view;
 
 	shadow_shader.bind();
@@ -153,7 +153,7 @@ int main(int argc, char** argv)
 	std::cout << "COMPILING SHADERS\n";
 	Shader shader("textured.vert", "textured.frag");
 	Shader shadow_shader("shadow.vert", "shadow.frag");
-	Shader water_shader("water.vert", "water.frag");
+	Shader water_shader("water.vert", "textured.frag");
 	Shader skybox_shader("skybox.vert", "skybox.frag");
 	std::cout << "COMPILED SHADERS\n";
 
@@ -194,6 +194,7 @@ int main(int argc, char** argv)
 	);
 
 	point_lights[0].bind_at(0, "point_lights", shader);
+	point_lights[0].bind_at(0, "point_lights", water_shader);
 
 	point_lights[1] = PointLight(
 		glm::vec3(7.0f, 52.f, 21.f),
@@ -206,6 +207,7 @@ int main(int argc, char** argv)
 	);
 
 	point_lights[1].bind_at(1, "point_lights", shader);
+	point_lights[1].bind_at(1, "point_lights", water_shader);
 
 	// set up spot lights
 	SpotLight spot_lights[NUM_POINT_LIGHTS];
@@ -220,6 +222,7 @@ int main(int argc, char** argv)
 	);
 
 	spot_lights[0].bind_at(0, "spot_lights", shader);
+	spot_lights[0].bind_at(0, "spot_lights", water_shader);
 
 	spot_lights[1] = SpotLight(
 		glm::vec3(-1.0f, 62.f, -9.f),
@@ -232,6 +235,7 @@ int main(int argc, char** argv)
 	);
 
 	spot_lights[1].bind_at(1, "spot_lights", shader);
+	spot_lights[1].bind_at(1, "spot_lights", water_shader);
 
 	DirectionalLight directional_light = DirectionalLight(glm::vec3(18,42.0f,21.1f),
 		glm::vec3(0.1f, 0.1f,0.1f),
@@ -311,7 +315,7 @@ int main(int argc, char** argv)
 		//Skybox::draw(skybox_shader, camera.get_camera_mat(45, 0.01, 1000.f));
 
 		// IMPORTANT : draw water after everything because it's transparent!!!
-		water.draw(water_shader, camera);
+		water.draw(water_shader, camera, light_projection, shadow_map);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
