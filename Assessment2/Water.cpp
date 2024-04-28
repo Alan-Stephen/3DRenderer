@@ -7,6 +7,9 @@ Water::Water(unsigned int height, unsigned int width, glm::vec3 scale, glm::vec3
     Texture specular = Texture("objs/water/water_specular.jpg", false, RGBA(0.0, 1.0, 0.0, 0.8));
 
     _material = Material(ambient, specular, diffuse, 8, "WATER_MATERIAL");
+    
+    // every 512 verts texture should repeat
+    float repeat = 16;
 
     int shininess = 16;
 
@@ -27,13 +30,16 @@ Water::Water(unsigned int height, unsigned int width, glm::vec3 scale, glm::vec3
                 float z2 = z1 + 1.0f;
 
                 // Add the vertices of the first triangle of the quad
-                _verts.push_back(x1); _verts.push_back(0.0f); _verts.push_back(z1); // Vertex 1
-                _verts.push_back(x1); _verts.push_back(0.0f); _verts.push_back(z2); // Vertex 3
-                _verts.push_back(x2); _verts.push_back(0.0f); _verts.push_back(z1); // Vertex 2
+                _verts.push_back(x1); _verts.push_back(0.0f); _verts.push_back(z1); _verts.push_back(x1 / repeat); _verts.push_back(z1 / repeat);// Vertex 1
+                _verts.push_back(x1); _verts.push_back(0.0f); _verts.push_back(z2); _verts.push_back(x1 / repeat); _verts.push_back(z2 / repeat);// Vertex 1
+                _verts.push_back(x2); _verts.push_back(0.0f); _verts.push_back(z1); _verts.push_back(x2 / repeat); _verts.push_back(z1 / repeat);// Vertex 1
 
-                _verts.push_back(x1); _verts.push_back(0.0f); _verts.push_back(z2); // Vertex 4
-                _verts.push_back(x2); _verts.push_back(0.0f); _verts.push_back(z2); // Vertex 6
-                _verts.push_back(x2); _verts.push_back(0.0f); _verts.push_back(z1); // Vertex 5
+
+                _verts.push_back(x1); _verts.push_back(0.0f); _verts.push_back(z2); _verts.push_back(x1 / repeat); _verts.push_back(z2 / repeat);// Vertex 1
+                _verts.push_back(x2); _verts.push_back(0.0f); _verts.push_back(z2); _verts.push_back(x2 / repeat); _verts.push_back(z2 / repeat);// Vertex 1
+                _verts.push_back(x2); _verts.push_back(0.0f); _verts.push_back(z1); _verts.push_back(x2 / repeat); _verts.push_back(z1 / repeat);// Vertex 1
+
+
         }
     }
 
@@ -43,8 +49,10 @@ Water::Water(unsigned int height, unsigned int width, glm::vec3 scale, glm::vec3
 		glBindVertexArray(_vao);
 		glBindBuffer(GL_ARRAY_BUFFER, _vbo);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * (_verts.size()), _verts.data(), GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+		glEnableVertexAttribArray(1);
 }
 
 void Water::draw(Shader &shader, const Camera *camera, glm::mat4 light_projection, unsigned int shadow_map)

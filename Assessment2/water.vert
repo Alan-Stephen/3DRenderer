@@ -4,6 +4,7 @@
 #define NUM_SUBWAVES 8
 
 layout(location = 0) in vec3 aPos;
+layout(location = 1) in vec2 aTex;
 
 uniform mat4 model;
 uniform mat4 cameraMat;
@@ -88,7 +89,7 @@ void main()
     // it looks different to the formula in GPU gems because they use weird (x,z,y) format idk why
     norm = normalize(vec3(-ddx, 1, -ddz));
 	frag_pos_light = light_projection * vec4(pos, 1.0f);
-    tex = vec2(0.0,0.0);
+    tex = aTex;
     // Transform the position to camera space and set gl_Position
     gl_Position = cameraMat * vec4(pos, 1f);
 }
