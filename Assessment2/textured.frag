@@ -45,8 +45,8 @@ struct PointLight {
 	float quadratic;
 };
 
-#define NUM_POINT_LIGHTS 4
-#define NUM_SPOT_LIGHTS 4
+#define NUM_POINT_LIGHTS 2
+#define NUM_SPOT_LIGHTS 2
 uniform PointLight point_lights[NUM_POINT_LIGHTS];
 uniform SpotLight spot_lights[NUM_SPOT_LIGHTS];
 uniform DirectionalLight directional_light;

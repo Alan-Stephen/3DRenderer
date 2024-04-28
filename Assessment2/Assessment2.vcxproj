@@ -142,19 +142,25 @@
   <ItemGroup>
     <ClCompile Include="..\..\include\GL\gl3w.c" />
     <ClCompile Include="Assessment2.cpp" />
+    <ClCompile Include="Boat.cpp" />
+    <ClCompile Include="BoatCamera.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="IndexBuffer.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Light.cpp" />
+    <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Skybox.cpp" />
+    <ClCompile Include="Spline.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
     <ClCompile Include="Water.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Boat.h" />
+    <ClInclude Include="BoatCamera.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="error.h" />
     <ClInclude Include="file.h" />
@@ -163,8 +169,10 @@
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Light.h" />
+    <ClInclude Include="Plane.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Skybox.h" />
+    <ClInclude Include="Spline.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="VertexBuffer.h" />
