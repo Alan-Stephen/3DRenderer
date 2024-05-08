@@ -1,0 +1,74 @@
+# Blender 4.1.1 MTL File: 'None'
+# www.blender.org
+
+newmtl M_Boat_Base_1_JFG
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd T_Boat_Base_1_JFG_BaseColor.png
+map_Ns T_Boat_Base_1_JFG_Roughness.png
+map_refl T_Boat_Base_1_JFG_Metallic.png
+map_Bump -bm 1.000000 T_Boat_Base_1_JFG_Normal.png
+
+newmtl M_Boat_MiddlePlank_1_JFG
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd T_Boat_MiddlePlank_1_JFG_BaseColor.png
+map_Ns T_Boat_MiddlePlank_1_JFG_Roughness.png
+map_refl T_Boat_MiddlePlank_1_JFG_Metallic.png
+map_Bump -bm 1.000000 T_Boat_MiddlePlank_1_JFG_Normal.png
+
+newmtl M_Boat_MiddlePlank_2_JFG
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd T_Boat_MiddlePlank_2_JFG_BaseColor.png
+map_Ns T_Boat_MiddlePlank_2_JFG_Roughness.png
+map_refl T_Boat_MiddlePlank_2_JFG_Metallic.png
+map_Bump -bm 1.000000 T_Boat_MiddlePlank_2_JFG_Normal.png
+
+newmtl M_Boat_Planks_JFG
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd T_Boat_Planks_JFG_BaseColor.png
+map_Ns T_Boat_Planks_JFG_Roughness.png
+map_refl T_Boat_Planks_JFG_Metallic.png
+map_Bump -bm 1.000000 T_Boat_Planks_JFG_Normal.png
+
+newmtl M_Boat_Supports_Horizontal_JFG
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd T_Boat_Supports_Horizontal_JFG_BaseColor.png
+map_Ns T_Boat_Supports_Horizontal_JFG_Roughness.png
+map_refl T_Boat_Supports_Horizontal_JFG_Metallic.png
+map_Bump -bm 1.000000 T_Boat_Supports_Horizontal_JFG_Normal.png
+
+newmtl M_Boat_Supports_Vertical_JFG
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd T_Boat_Supports_Vertical_JFG_BaseColor.png
+map_Ns T_Boat_Supports_Vertical_JFG_Roughness.png
+map_refl T_Boat_Supports_Vertical_JFG_Metallic.png
+map_Bump -bm 1.000000 T_Boat_Supports_Vertical_JFG_Normal.png

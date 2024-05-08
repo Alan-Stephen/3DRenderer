@@ -6,8 +6,8 @@ Boat::Boat(std::string filename, glm::vec3 scale, glm::vec3 translate) : Model(f
 {
 	// note these have to be the exact same as in water.vert, otherwise the results of get_height will be wrong
 
-    // reverse the translatoin from the base class constructor
-    _model = glm::scale(glm::mat4(1.0f), scale);
+    // reverse the translation and scale from the base class constructor, so we can apply matrix transforms in right order
+    _model = glm::mat4(1.0f);
 
     _random_dirs = {
 		glm::vec2(0.56,0.02),
@@ -33,6 +33,7 @@ Boat::Boat(std::string filename, glm::vec3 scale, glm::vec3 translate) : Model(f
 	_speed_brownian = 1.1f;
     _num_subwaves = 8;
     _position = translate;
+    _scale = scale;
     _orientation = glm::vec3(0, 0, 1);
 }
 
@@ -48,7 +49,7 @@ glm::mat4 Boat::get_model() const
     // look at matrix also applies translation as well as rotation
     glm::mat4 rotation = glm::inverse(glm::lookAt(movement, movement + _orientation, glm::vec3(0.0, 1.0, 0.0)));
 
-    return res * rotation;
+    return glm::scale(res * rotation,_scale);
 }
 
 glm::vec3 Boat::get_orientation() const

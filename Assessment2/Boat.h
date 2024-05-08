@@ -25,6 +25,7 @@ private:
 	int _num_subwaves;
 	glm::vec3 _position;
 	glm::vec3 _orientation;
+	glm::vec3 _scale;
 	const float _base_y;
 	std::vector<glm::vec3> _samples;
 

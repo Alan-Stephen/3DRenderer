@@ -161,7 +161,7 @@ int main(int argc, char** argv)
 	std::cout << "PARSING OBJECTS\n";
 	std::vector<std::unique_ptr<Model>> models;
 
-	Boat boat = Boat("objs/Boat/boat.obj", glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-50.f, 0.f, 150.f));
+	Boat boat = Boat("objs/Boat/boat.obj", glm::vec3(10.0f, 10.0f, 10.0f), glm::vec3(-50.f, 0.f, 150.f));
 	models.push_back(std::make_unique<Model>("objs/house/house.obj", glm::vec3(30.0f, 30.f, 30.f), glm::vec3(00.f, 45.f, 00.f)));
 	glm::mat4 model = glm::mat4(1.0f);
 	std::vector<glm::vec3> control_points = {
