@@ -93,6 +93,7 @@ int m_mtl_parse(char* filename, std::vector<Material> &mtls)
 					Texture(specular_fil, specular_fil == "", specular_color),
 					Texture(diffuse_fil, diffuse_fil == "", diffuse_color),
 					shininess,
+					1.0f,
 					name
 				);
 
@@ -139,6 +140,7 @@ int m_mtl_parse(char* filename, std::vector<Material> &mtls)
 		Texture(specular_fil, specular_fil == "", specular_color),
 		Texture(diffuse_fil, diffuse_fil == "", diffuse_color),
 		shininess,
+		1.0f,
 		name
 	);
 

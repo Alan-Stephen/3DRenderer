@@ -9,7 +9,7 @@ uniform sampler2D diffuse_tex;
 uniform sampler2D specular_tex;
 uniform sampler2D shadow_map;
 uniform float shininess;
-
+uniform float transparency; 
 
 uniform vec3 cam_pos;
 
@@ -149,6 +149,11 @@ void main()
 {
 	vec4 col = texture(diffuse_tex,tex);
 	float a = col.a;
+
+    // we check to see if transparency is not the default value (1.0f). 
+    if(transparency != 1.0f) {
+        a = transparency;
+    }
 	
 	if(a == 0.0) {
 		discard;

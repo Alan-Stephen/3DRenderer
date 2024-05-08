@@ -6,7 +6,7 @@ Water::Water(unsigned int height, unsigned int width, glm::vec3 scale, glm::vec3
     Texture diffuse = Texture("objs/water/water_diffuse.jpg", false, RGBA(0.0, 1.0, 0.0, 0.4));
     Texture specular = Texture("objs/water/water_specular.jpg", false, RGBA(0.0, 1.0, 0.0, 0.4));
 
-    _material = Material(ambient, specular, diffuse, 8, "WATER_MATERIAL");
+    _material = Material(ambient, specular, diffuse, 8, 0.8f, "WATER_MATERIAL");
     
     // every 512 verts texture should repeat
     float repeat = 16;
