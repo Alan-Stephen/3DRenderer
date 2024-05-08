@@ -89,8 +89,8 @@ void set_up_shadow_map(Shader &shadow_shader, unsigned int &shadow_map_fbo, unsi
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	glm::mat4 orthogonal_projection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 1000.0f);
-	glm::mat4 light_view = glm::lookAt(900.f * glm::vec3(.18, 0.42, 0.22), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.0f, 0.f));
+	glm::mat4 orthogonal_projection = glm::ortho(-200.0f, 120.0f, -200.0f, 100.0f, 0.1f, 1000.0f);
+	glm::mat4 light_view = glm::lookAt(400.f * glm::vec3(.18, 0.42, 0.22), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.0f, 0.f));
 	light_projection = orthogonal_projection * light_view;
 
 	shadow_shader.bind();
@@ -161,8 +161,8 @@ int main(int argc, char** argv)
 	std::cout << "PARSING OBJECTS\n";
 	std::vector<std::unique_ptr<Model>> models;
 
-	Boat boat = Boat("objs/Boat/boat.obj", glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.f, 0.f, 100.f));
-	models.push_back(std::make_unique<Model>("objs/house/house.obj", glm::vec3(10.0f, 10.f, 10.f), glm::vec3(00.f, 45.f, 00.f)));
+	Boat boat = Boat("objs/Boat/boat.obj", glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-50.f, 0.f, 150.f));
+	models.push_back(std::make_unique<Model>("objs/house/house.obj", glm::vec3(30.0f, 30.f, 30.f), glm::vec3(00.f, 45.f, 00.f)));
 	glm::mat4 model = glm::mat4(1.0f);
 	std::vector<glm::vec3> control_points = {
 		glm::vec3(4000,30,4000),
@@ -239,9 +239,9 @@ int main(int argc, char** argv)
 	spot_lights[1].bind_at(1, "spot_lights", water_shader);
 
 	DirectionalLight directional_light = DirectionalLight(glm::vec3(18,42.0f,21.1f),
-		glm::vec3(0.1f, 0.1f,0.1f),
-		glm::vec3(0.4, 0.4,0.4),
-		glm::vec3(.4f, .4f,.4));
+		glm::vec3(0.2f, 0.2f,0.2f),
+		glm::vec3(0.6, 0.6,0.6),
+		glm::vec3(.6f, .6f,.6));
 
 	directional_light.bind(shader);
 	directional_light.bind(water_shader);

@@ -20,8 +20,8 @@ Boat::Boat(std::string filename, glm::vec3 scale, glm::vec3 translate) : Model(f
 		glm::vec2(-0.98,0.52)
 	};
 
-    for (float x = -7; x < 7; x += 0.5f) {
-        for (float y = -7; y < 7; y += 0.5f) {
+    for (float x = -7; x < 7; x += 1.0f) {
+        for (float y = -7; y < 7; y += 1.0f) {
             _samples.emplace_back(x, 0, y);
         }
     }

@@ -2,9 +2,9 @@
 
 Water::Water(unsigned int height, unsigned int width, glm::vec3 scale, glm::vec3 translate)
 {
-    Texture ambient = Texture("", true, RGBA(0.0, 1.0, 0.0, 0.8));
-    Texture diffuse = Texture("objs/water/water_diffuse.jpg", false, RGBA(0.0, 1.0, 0.0, 0.8));
-    Texture specular = Texture("objs/water/water_specular.jpg", false, RGBA(0.0, 1.0, 0.0, 0.8));
+    Texture ambient = Texture("", true, RGBA(0.0, 1.0, 0.0, 0.4));
+    Texture diffuse = Texture("objs/water/water_diffuse.jpg", false, RGBA(0.0, 1.0, 0.0, 0.4));
+    Texture specular = Texture("objs/water/water_specular.jpg", false, RGBA(0.0, 1.0, 0.0, 0.4));
 
     _material = Material(ambient, specular, diffuse, 8, "WATER_MATERIAL");
     
