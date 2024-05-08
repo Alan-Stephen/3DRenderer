@@ -89,7 +89,7 @@ void set_up_shadow_map(Shader &shadow_shader, unsigned int &shadow_map_fbo, unsi
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	glm::mat4 orthogonal_projection = glm::ortho(-200.0f, 120.0f, -200.0f, 100.0f, 0.1f, 1000.0f);
+	glm::mat4 orthogonal_projection = glm::ortho(-300.0f, 120.0f, -300.0f, 100.0f, 0.1f, 1000.0f);
 	glm::mat4 light_view = glm::lookAt(400.f * glm::vec3(.18, 0.42, 0.22), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.0f, 0.f));
 	light_projection = orthogonal_projection * light_view;
 
@@ -161,7 +161,7 @@ int main(int argc, char** argv)
 	std::cout << "PARSING OBJECTS\n";
 	std::vector<std::unique_ptr<Model>> models;
 
-	Boat boat = Boat("objs/Boat/boat.obj", glm::vec3(10.0f, 10.0f, 10.0f), glm::vec3(-50.f, 0.f, 150.f));
+	Boat boat = Boat("objs/Boat/boat.obj", glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-50.f, 0.f, 150.f));
 	models.push_back(std::make_unique<Model>("objs/house/house.obj", glm::vec3(30.0f, 30.f, 30.f), glm::vec3(00.f, 45.f, 00.f)));
 	glm::mat4 model = glm::mat4(1.0f);
 	std::vector<glm::vec3> control_points = {
@@ -268,8 +268,8 @@ int main(int argc, char** argv)
 
 	shader.bind();
 
-	Camera normal_camera = Camera(width, height, glm::vec3(0.0, 0.0, 0.0), 45, 0.01, 5000);
-	BoatCamera boat_camera = BoatCamera(width, height, glm::vec3(0.0, 0.0, 0.0), boat, 45, 0.01, 5000);
+	Camera normal_camera = Camera(width, height, glm::vec3(0.0, 0.0, 0.0), 45, 1, 1000);
+	BoatCamera boat_camera = BoatCamera(width, height, glm::vec3(0.0, 0.0, 0.0), boat, 45, 1, 1000);
 
 	Camera* camera = &normal_camera;
 	bool is_normal = true;

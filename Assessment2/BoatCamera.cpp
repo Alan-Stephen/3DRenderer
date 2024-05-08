@@ -49,8 +49,8 @@ glm::vec3 BoatCamera::get_pos() const
 
 	// modify position of camera relative to position of the boat
 	// this will make it so the camera is hovering behind and above the boat
-	pos.y += 25;
-	pos -= 60.0f * _boat.get_orientation();
+	pos.y += 35;
+	pos -= 70.0f * _boat.get_orientation();
 	return pos;
 }
 
@@ -79,7 +79,7 @@ void BoatCamera::bind(Shader& shader, std::string uniform) const
 
 	// change orientation so that the camera faces slightly down towards the boat.
 	// emulating the 3rd person camera effect.
-	orient.y = -0.1;
+	orient.y = -0.2;
 	view = glm::lookAt(pos, pos + orient, _up);
 	projection = glm::perspective(glm::radians(_fov), (float)(_width / _height), _near_plane, _far_plane);
 
