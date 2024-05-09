@@ -28,6 +28,7 @@
 #include "Plane.h"
 #include "Boat.h"
 #include "BoatCamera.h"
+#include "LightCube.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -96,6 +97,7 @@ void set_up_shadow_map(Shader &shadow_shader, unsigned int &shadow_map_fbo, unsi
 	shadow_shader.bind();
 	glUniformMatrix4fv(shadow_shader.get_uniform_location("light_projection"), 1, GL_FALSE, glm::value_ptr(light_projection));
 }
+
 void render_shadow_map(Shader &shadow_shader, unsigned int shadow_map_fbo, std::vector<std::unique_ptr<Model>> &models, const Boat &boat) {
 		shadow_shader.bind();
 		glEnable(GL_DEPTH_TEST);
@@ -138,6 +140,20 @@ void render_scene(std::vector<std::unique_ptr<Model>> &models, const Camera *cam
 	glBindVertexArray(0);
 }
 
+void render_light_cubes(Shader& shader, Camera* camera, std::vector<std::unique_ptr<LightCube>> &point_light_cubes, std::vector<std::unique_ptr<LightCube>> &spot_light_cubes) {
+	for (int i = 0; i < NUM_POINT_LIGHTS; i++) {
+		point_light_cubes.at(i).get()->draw(shader, camera);
+	}
+	
+
+	// not going to use spot lights as light cubes. 
+	/*
+	for (int i = 0; i < NUM_SPOT_LIGHTS; i++) {
+		spot_light_cubes.at(i).get()->draw(shader, camera);
+	}
+	*/
+}
+
 int main(int argc, char** argv)
 {
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );  
@@ -156,6 +172,8 @@ int main(int argc, char** argv)
 	Shader shadow_shader("shadow.vert", "shadow.frag");
 	Shader water_shader("water.vert", "textured.frag");
 	Shader skybox_shader("skybox.vert", "skybox.frag");
+	Shader light_cube_shader("light.vert", "light.frag");
+
 	std::cout << "COMPILED SHADERS\n";
 
 	std::cout << "PARSING OBJECTS\n";
@@ -183,37 +201,44 @@ int main(int argc, char** argv)
 
 	// set up lighting in scene
 	PointLight point_lights[NUM_POINT_LIGHTS];
+	std::vector<std::unique_ptr<LightCube>> point_light_cubes;
 
 	point_lights[0] = PointLight(
-		glm::vec3(-6.0f, 52.f, 21.f),
-		glm::vec3(1.0f, .5f, .5f),
-		glm::vec3(1.0f, .5f, .5f),
+		glm::vec3(21.0f, 65.f, 65.f),
+		glm::vec3(1.0f, .8f, .8f),
+		glm::vec3(.2f, .2f, .2f),
 		glm::vec3(0.f, 0.f, 0.f),
-		.5f,
-		.1f,
-		0.01f
+		.001f,
+		.001f,
+		0.001f
 	);
+
+	point_light_cubes.push_back(std::make_unique<LightCube>(glm::vec3(22.0f, 65.0f, 62.5f), glm::vec3(3.2,3.5,3.2), glm::vec3(1.0,.8,.8)));
 
 	point_lights[0].bind_at(0, "point_lights", shader);
 	point_lights[0].bind_at(0, "point_lights", water_shader);
 
 	point_lights[1] = PointLight(
-		glm::vec3(7.0f, 52.f, 21.f),
-		glm::vec3(1.0f, .5f, .5f),
-		glm::vec3(1.0f, .5f, .5f),
+		glm::vec3(-21.0f, 68.f, 65.f),
+		glm::vec3(1.0f, .8f, .8f),
+		glm::vec3(0.2f, .2f, .2f),
 		glm::vec3(0.f, 0.f, 0.f),
-		.5f,
-		.1f,
-		0.01f
+		.0001f,
+		.001f,
+		0.001f
 	);
+
+	point_light_cubes.push_back(std::make_unique<LightCube>(glm::vec3(-19.0f, 66.0f, 64.5f), glm::vec3(3.2,3.5,3.2), glm::vec3(1.0,.8,.8)));
 
 	point_lights[1].bind_at(1, "point_lights", shader);
 	point_lights[1].bind_at(1, "point_lights", water_shader);
 
 	// set up spot lights
-	SpotLight spot_lights[NUM_POINT_LIGHTS];
+	SpotLight spot_lights[NUM_SPOT_LIGHTS];
+	std::vector<std::unique_ptr<LightCube>> spot_light_cubes;
+
 	spot_lights[0] = SpotLight(
-		glm::vec3(0.0f, 60.f, 8.f),
+		glm::vec3(-3.0f, 94.f, -27.f),
 		glm::vec3(0.0f, 1.f, 0.f),
 		glm::vec3(0.0f, 0.f, 0.f),
 		glm::vec3(1.0f, 1.f, 1.f),
@@ -222,11 +247,12 @@ int main(int argc, char** argv)
 		0.90
 	);
 
+	spot_light_cubes.push_back(std::make_unique<LightCube>(glm::vec3(0, 60, 8), glm::vec3(1, 1, 1), glm::vec3(1.0,1.0,1.0)));
 	spot_lights[0].bind_at(0, "spot_lights", shader);
 	spot_lights[0].bind_at(0, "spot_lights", water_shader);
 
 	spot_lights[1] = SpotLight(
-		glm::vec3(-1.0f, 62.f, -9.f),
+		glm::vec3(-3.0f, 94.f, 24.f),
 		glm::vec3(0.0f, 1.f, 0.f),
 		glm::vec3(0.0f, 0.f, 0.f),
 		glm::vec3(1.0f, 1.f, 1.f),
@@ -235,6 +261,7 @@ int main(int argc, char** argv)
 		0.90
 	);
 
+	spot_light_cubes.push_back(std::make_unique<LightCube>(glm::vec3(-1, 60, -9), glm::vec3(1, 1, 1), glm::vec3(1.0,1.0,1.0)));
 	spot_lights[1].bind_at(1, "spot_lights", shader);
 	spot_lights[1].bind_at(1, "spot_lights", water_shader);
 
@@ -313,7 +340,9 @@ int main(int argc, char** argv)
 
 
 		skybox.draw(skybox_shader, camera->get_camera_mat());
-		//Skybox::draw(skybox_shader, camera.get_camera_mat(45, 0.01, 1000.f));
+
+		render_light_cubes(light_cube_shader, camera, point_light_cubes, spot_light_cubes);
+
 
 		// IMPORTANT : draw water after everything because it's transparent!!!
 		water.draw(water_shader, camera, light_projection, shadow_map);
