@@ -4,6 +4,7 @@
 BoatCamera::BoatCamera(int width, int height, glm::vec3 position, Boat &boat, float fov, float near_plane, float far_plane) : 
 	Camera(width, height, position, fov, near_plane, far_plane), _boat(boat)
 {
+	_speed = 0.5f;
 }
 
 void BoatCamera::handleInput(GLFWwindow * window)
@@ -34,7 +35,7 @@ void BoatCamera::handleInput(GLFWwindow * window)
 	}
 	else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
 	{
-		_speed = 1.1f;
+		_speed = .5f;
 	}
 	
 	_boat.set_orientation(orientation);
@@ -45,11 +46,13 @@ glm::vec3 BoatCamera::get_pos() const
 {
 	// position of y will be stale so we have to update y value ourselves
 	glm::vec3 pos = _boat.get_position();
-	pos.y = _boat.get_max_height(glfwGetTime(), pos);
+
+	// we use get max height to not make camera shake
+	pos.y = _boat.get_height(glfwGetTime(), pos) + 1.0f;
 
 	// modify position of camera relative to position of the boat
 	// this will make it so the camera is hovering behind and above the boat
-	pos.y += 35;
+	pos.y += 15;
 	pos -= 70.0f * _boat.get_orientation();
 	return pos;
 }
@@ -61,7 +64,7 @@ glm::mat4 BoatCamera::get_camera_mat()
 
 	glm::vec3 pos = get_pos();
 
-	view = glm::lookAt(pos, pos + _boat.get_orientation(), _up);
+	view = glm::lookAt(pos, pos + _boat.get_orientation(), _boat.get_boat_up(glfwGetTime()));
 	projection = glm::perspective(glm::radians(_fov), (float)(_width / _height), _near_plane, _far_plane);
 
 	return projection * view;
@@ -80,7 +83,7 @@ void BoatCamera::bind(Shader& shader, std::string uniform) const
 	// change orientation so that the camera faces slightly down towards the boat.
 	// emulating the 3rd person camera effect.
 	orient.y = -0.2;
-	view = glm::lookAt(pos, pos + orient, _up);
+	view = glm::lookAt(pos, pos + orient, _boat.get_boat_up(glfwGetTime()));
 	projection = glm::perspective(glm::radians(_fov), (float)(_width / _height), _near_plane, _far_plane);
 
 	glUniformMatrix4fv(shader.get_uniform_location(uniform),1, GL_FALSE, glm::value_ptr(projection * view));

@@ -1,6 +1,7 @@
 #include "Boat.h"
 #include <iostream>
 #include "glm/gtx/string_cast.hpp"
+#include "math.h"
 
 Boat::Boat(std::string filename, glm::vec3 scale, glm::vec3 translate) : Model(filename, scale, translate), _base_y(translate.y)
 {
@@ -20,8 +21,8 @@ Boat::Boat(std::string filename, glm::vec3 scale, glm::vec3 translate) : Model(f
 		glm::vec2(-0.98,0.52)
 	};
 
-    for (float x = -7; x < 7; x += 1.0f) {
-        for (float y = -7; y < 7; y += 1.0f) {
+    for (float x = -5; x < 5; x += 2.0f) {
+        for (float y = -5; y < 5; y += 2.0f) {
             _samples.emplace_back(x, 0, y);
         }
     }
@@ -44,11 +45,19 @@ glm::mat4 Boat::get_model() const
     glm::mat4 res = _model;
     glm::vec3 movement = _position;
 
-    movement.y = get_max_height(glfwGetTime(), _position);
+    movement.y = get_height(glfwGetTime(), _position) + 3.0f;
+	float forward_y = get_height(glfwGetTime(), _position + 1.f * _orientation) + 3.0f;
+    glm::vec3 forward = movement + _orientation;
+    forward.y = forward_y;
 
-    // look at matrix also applies translation as well as rotation
-    glm::mat4 rotation = glm::inverse(glm::lookAt(movement, movement + _orientation, glm::vec3(0.0, 1.0, 0.0)));
 
+    glm::vec3 right = glm::cross(_orientation, glm::vec3(0.0, 1.0, 0.0));
+    right.y = get_height(glfwGetTime(), _position + right) + 3.0f;
+    right.y -= movement.y;
+
+    glm::vec3 up = glm::cross(forward - movement, right);
+
+    glm::mat4 rotation = glm::inverse(glm::lookAt(movement, forward, -up));
     return glm::scale(res * rotation,_scale);
 }
 
@@ -72,18 +81,23 @@ glm::vec3 Boat::get_position() const
     return _position;
 }
 
-float Boat::get_max_height(double timeSecs, glm::vec3 position) const
+glm::vec3 Boat::get_boat_up(float time) const
 {
-    float max_y = FLT_MIN;
+    glm::vec3 movement = _position;
+    movement.y = get_height(glfwGetTime(), _position) + 3.0f;
+	float forward_y = get_height(glfwGetTime(), _position + 1.f * _orientation) + 3.0f;
+    glm::vec3 forward = movement + _orientation;
+    forward.y = forward_y;
 
-    for (const glm::vec3& sample : _samples) {
-        glm::vec3 curr_position = position + sample;
-        max_y = max(get_height(static_cast<float>(timeSecs), curr_position),max_y );
-    }
 
-    assert(max_y != FLT_MIN);
+    glm::vec3 right = glm::cross(_orientation, glm::vec3(0.0, 1.0, 0.0));
+    right.y = get_height(glfwGetTime(), _position + right) + 3.0f;
+    right.y -= movement.y;
 
-    return max_y;
+    right = glm::normalize(right);
+
+    // reverse negated otherwise up will be facing wrong way.
+    return -glm::normalize(glm::cross(glm::normalize(forward - movement), right));
 }
 
 float Boat::get_height(float timeSecs, glm::vec3 pos) const

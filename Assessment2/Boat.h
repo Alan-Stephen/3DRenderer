@@ -5,6 +5,7 @@
 #include "glm/common.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include <vector>
+#define TAU 6.2831853f
 
 class Boat : public Model
 {
@@ -16,7 +17,8 @@ public:
 	void set_orientation(glm::vec3 orientation);
 	void set_position(glm::vec3 position);
 
-	float get_max_height(double timeSecs, glm::vec3 position) const;
+	float get_height(float timeSecs, glm::vec3 position) const;
+	glm::vec3 get_boat_up(float time) const;
 private:
 	std::vector<glm::vec2> _random_dirs;
 	float _speed_brownian;
@@ -29,7 +31,6 @@ private:
 	const float _base_y;
 	std::vector<glm::vec3> _samples;
 
-	float get_height(float timeSecs, glm::vec3 position) const;
 };
 
 struct SubWave {

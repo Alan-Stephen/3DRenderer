@@ -99,16 +99,17 @@ void set_up_shadow_map(Shader &shadow_shader, unsigned int &shadow_map_fbo, unsi
 }
 
 void render_shadow_map(Shader &shadow_shader, unsigned int shadow_map_fbo, std::vector<std::unique_ptr<Model>> &models, const Boat &boat) {
-		shadow_shader.bind();
-		glEnable(GL_DEPTH_TEST);
-		glViewport(0, 0, shadow_width, shadow_height);
-		glBindFramebuffer(GL_FRAMEBUFFER, shadow_map_fbo);
-		glClear(GL_DEPTH_BUFFER_BIT);
+	shadow_shader.bind();
+	glEnable(GL_DEPTH_TEST);
+	glViewport(0, 0, shadow_width, shadow_height);
+	glBindFramebuffer(GL_FRAMEBUFFER, shadow_map_fbo);
+	glClear(GL_DEPTH_BUFFER_BIT);
 
-		for(int i = 0; i < models.size(); i++) {
-			models.at(i).get()->draw(shadow_shader);
-		}	
-		boat.draw(shadow_shader);
+	for(int i = 0; i < models.size(); i++) {
+		models.at(i).get()->draw(shadow_shader);
+	}	
+
+	boat.draw(shadow_shader);
 }
 
 void render_scene(std::vector<std::unique_ptr<Model>> &models, const Camera *camera, Shader &shader, glm::mat4 &light_projection, unsigned int shadow_map, const Boat &boat) 
