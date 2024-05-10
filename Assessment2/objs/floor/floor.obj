@@ -1,0 +1,21 @@
+# Vertices
+mtllib floor.mtl
+
+v -1.0 0.0 1.0  # Vertex 1 (bottom left)
+v -1.0 0.0 -1.0  # Vertex 2 (top left)
+v 1.0 0.0 -1.0  # Vertex 3 (bottom right)
+v 1.0 0.0 1.0  # Vertex 4 (top right)
+
+# Texture coordinates (not needed for this example)
+vt 1.0 1.0  # Texture coordinate for vertex 1
+vt 1.0 0.0  # Texture coordinate for vertex 2
+vt 0.0 0.0  # Texture coordinate for vertex 3
+vt 0.0 1.0  # Texture coordinate for vertex 4
+
+vn 0.0 1.0 0.0  
+vn 0.0 -1.0 0.0  
+
+usemtl floor
+
+f 3/3/1 2/2/1 1/1/1  
+f 4/4/1 3/3/1 1/1/1  
