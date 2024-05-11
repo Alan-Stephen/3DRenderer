@@ -29,7 +29,9 @@
 #include "Boat.h"
 #include "BoatCamera.h"
 #include "LightCube.h"
+#include  "Terrain.h"
 
+// no includes that use stb after stb_image_
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -193,6 +195,8 @@ int main(int argc, char** argv)
 
 	// plane should loop every 10 seconds, rotate it 270.0f intially, otherwise it'll be facing the wrong direction
 	models.push_back(std::make_unique<Plane>("objs/birb/birb.obj", glm::vec3(.1f, .1f, .1f), glm::vec3(00.f, 0.f, 00.f), Spline(control_points), 10, 270.0f));
+
+	models.push_back(std::make_unique<Terrain>(glm::vec3(1.0, 1.0, 1.0), glm::vec3(1.0, 80.0, 1.0), 500, 500));
 
 	Water water = Water(400,400, glm::vec3(2.0,1.0,2.0), glm::vec3(-200,0,-200));
 

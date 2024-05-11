@@ -16,6 +16,7 @@ protected:
 	std::vector<Mesh> _meshes;
 	std::vector<Material> _materials;
 	glm::mat4 _model = glm::mat4(1.f);
+	Model() {};
 public:
 	Model(std::string filename, glm::vec3 scale, glm::vec3 translate);
 	~Model();
