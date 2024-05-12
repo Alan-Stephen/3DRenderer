@@ -24,110 +24,112 @@ Terrain::Terrain(glm::vec3 scale, glm::vec3 translate, int height, int width) :
 
                 
                 
-                verts.emplace_back(glm::vec3(x1, perlin(x1, z1), z1), glm::vec2(x1 / repeat, z1 / repeat), perlin_norm(x1, z1));
-                verts.emplace_back(glm::vec3(x1, perlin(x1, z2), z2), glm::vec2(x1 / repeat, z2 / repeat), perlin_norm(x1, z2));
-                verts.emplace_back(glm::vec3(x2, perlin(x2, z1), z1), glm::vec2(x2 / repeat, z1 / repeat), perlin_norm(x2, z1));
+                verts.emplace_back(glm::vec3(x1, perlin(x1, z1, _model), z1), glm::vec2(x1 / repeat, z1 / repeat), perlin_norm(x1, z1));
+                verts.emplace_back(glm::vec3(x1, perlin(x1, z2, _model), z2), glm::vec2(x1 / repeat, z2 / repeat), perlin_norm(x1, z2));
+                verts.emplace_back(glm::vec3(x2, perlin(x2, z1, _model), z1), glm::vec2(x2 / repeat, z1 / repeat), perlin_norm(x2, z1));
                                                                                                    
-                verts.emplace_back(glm::vec3(x1, perlin(x1, z2), z2), glm::vec2(x1 / repeat, z2 / repeat), perlin_norm(x1, z2));
-                verts.emplace_back(glm::vec3(x2, perlin(x2, z2), z2), glm::vec2(x2 / repeat, z2 / repeat), perlin_norm(x2, z2));
-                verts.emplace_back(glm::vec3(x2, perlin(x2, z1), z1), glm::vec2(x2 / repeat, z1 / repeat), perlin_norm(x2, z1));
+                verts.emplace_back(glm::vec3(x1, perlin(x1, z2, _model), z2), glm::vec2(x1 / repeat, z2 / repeat), perlin_norm(x1, z2));
+                verts.emplace_back(glm::vec3(x2, perlin(x2, z2, _model), z2), glm::vec2(x2 / repeat, z2 / repeat), perlin_norm(x2, z2));
+                verts.emplace_back(glm::vec3(x2, perlin(x2, z1, _model), z1), glm::vec2(x2 / repeat, z1 / repeat), perlin_norm(x2, z1));
         }
     }
 
     _meshes.emplace_back(verts, 0);
 }
 
-typedef struct {
-    float x, y;
-} vector2;
- 
-vector2 randomGradient(int ix, int iy) {
-    // No precomputed gradients mean this works for any number of grid coordinates
+glm::vec2 Terrain::rand_grad(int ix, int iy) {
+
     const unsigned w = 8 * sizeof(unsigned);
     const unsigned s = w / 2; 
+
+    // this is to generate a psuedorandom number.
     unsigned a = ix, b = iy;
-    a *= 3284157443;
+    a *= 2145254621;
  
     b ^= a << s | a >> w - s;
-    b *= 1911520717;
+    b *= 4927358917;
  
     a ^= b << s | b >> w - s;
-    a *= 2048419325;
-    float random = a * (3.14159265 / ~(~0u >> 1)); // in [0, 2*Pi]
+    a *= 1131119371;
+
+    float random = a * (3.14159265 / ~(~0u >> 1)); 
     
-    // Create the vector from the angle
-    vector2 v;
+    glm::vec2 v;
     v.x = sin(random);
     v.y = cos(random);
  
     return v;
 }
  
-// Computes the dot product of the distance and gradient vectors.
-float dotGridGradient(int ix, int iy, float x, float y) {
-    // Get gradient from integer coordinates
-    vector2 gradient = randomGradient(ix, iy);
+// computes dot product of distance to random gradient.
+float Terrain::grid_grad(int ix, int iy, float x, float y) {
+    glm::vec2 gradient = rand_grad(ix, iy);
  
-    // Compute the distance vector
     float dx = x - (float)ix;
     float dy = y - (float)iy;
  
-    // Compute the dot-product
-    return (dx * gradient.x + dy * gradient.y);
+    return glm::dot(glm::vec2(dx,dy),gradient);
 }
  
-float interpolate(float a0, float a1, float w)
+float Terrain::lerp(float start, float end, float t)
 {
-    return (a1 - a0) * (3.0 - w * 2.0) * w * w + a0;
+    // cubic interporalation to make it smoother;
+    return (end - start) * (3.0 - t * 2.0) * t * t + start;
 }
 
-float Terrain::perlin(float a, float b)
+float Terrain::perlin(float a, float b, glm::mat4 model)
 {
-    glm::vec4 worldSpacePos = _model * glm::vec4(a, 0, b, 1.0f);
+    glm::vec4 worldSpacePos = model * glm::vec4(a, 0, b, 1.0f);
     
-    // Determine grid cell corner coordinates
-    float x = static_cast<float>(worldSpacePos.x) / static_cast<float>(_width / 2);
-    float y = static_cast<float>(worldSpacePos.z) / static_cast<float>(_height / 2);
+    // determine grid cell corner coordinates
+    float x = static_cast<float>(worldSpacePos.x) / static_cast<float>(80);
+    float y = static_cast<float>(worldSpacePos.z) / static_cast<float>(80);
 
     int x0 = (int)x;
     int y0 = (int)y;
+
     int x1 = x0 + 1;
     int y1 = y0 + 1;
 
-    // Compute Interpolation weights
+    // weights for lerping
     float sx = x - (float)x0;
     float sy = y - (float)y0;
 
-    // Compute and interpolate top two corners
-    float n0 = dotGridGradient(x0, y0, x, y);
-    float n1 = dotGridGradient(x1, y0, x, y);
-    float ix0 = interpolate(n0, n1, sx);
+    // lerp for top corners
+    float n0 = grid_grad(x0, y0, x, y);
+    float n1 = grid_grad(x1, y0, x, y);
+    float ix0 = lerp(n0, n1, sx);
 
-    // Compute and interpolate bottom two corners
-    n0 = dotGridGradient(x0, y1, x, y);
-    n1 = dotGridGradient(x1, y1, x, y);
-    float ix1 = interpolate(n0, n1, sx);
+    // lerp for bottom corners
+    n0 = grid_grad(x0, y1, x, y);
+    n1 = grid_grad(x1, y1, x, y);
+    float ix1 = lerp(n0, n1, sx);
 
-    // Final step: interpolate between the two previously interpolated values, now in y
-    float value = interpolate(ix0, ix1, sy);
+    // final lerp
+    float value = lerp(ix0, ix1, sy);
 
+    // increase the amplitude;
     return value * 75;
 }
 
+// calculates normal of a vertex sampling perlin at point x,y
 glm::vec3 Terrain::perlin_norm(int x, int y)
 {
+
+    // this just calculates the derivtive with respect to x and y on the plane from first principles.
     float delta = 0.1;
 
     glm::vec3 dx = glm::vec3(delta, 0, 0);
-    float centre = perlin(x, y);
-    dx.y = perlin(x + delta, y) - centre;
+    float centre = perlin(x, y, _model);
+    dx.y = perlin(x + delta, y, _model) - centre;
 
 
     glm::vec3 dz = glm::vec3(0, 0, delta);
-    dz.y = perlin(x , y + delta) - centre;
+    dz.y = perlin(x , y + delta, _model) - centre;
     dx = dx / delta;
     dz = dz / delta;
 
+    // normal is cross product of tangent and binormal
     glm::vec3 res = glm::normalize(glm::cross((dz), (dx)));
     return res;
 }

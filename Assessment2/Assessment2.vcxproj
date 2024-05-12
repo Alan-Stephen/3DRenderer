@@ -145,6 +145,7 @@
     <ClCompile Include="Boat.cpp" />
     <ClCompile Include="BoatCamera.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Grass.cpp" />
     <ClCompile Include="IndexBuffer.cpp" />
     <ClCompile Include="LightCube.cpp" />
     <ClCompile Include="Material.cpp" />
@@ -166,6 +167,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="error.h" />
     <ClInclude Include="file.h" />
+    <ClInclude Include="Grass.h" />
     <ClInclude Include="IndexBuffer.h" />
     <ClInclude Include="LightCube.h" />
     <ClInclude Include="Material.h" />
