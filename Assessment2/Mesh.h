@@ -21,9 +21,11 @@ private:
 	unsigned int _vbo;
 	unsigned int _material_ref;
 public:
-	Mesh(const std::vector<Vertex> &verts, unsigned int material_ref);
+	Mesh(const std::vector<Vertex> &verts, unsigned int material_ref, unsigned int stride);
 	void deinit();
 	void draw() const;
 	unsigned int get_material_ref() const;
+	unsigned int get_vao() const;
+	unsigned int get_num_verticies() const;
 };
 

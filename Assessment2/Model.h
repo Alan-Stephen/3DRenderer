@@ -19,8 +19,9 @@ protected:
 	Model() {};
 public:
 	Model(std::string filename, glm::vec3 scale, glm::vec3 translate);
+	Model(std::string filename, glm::vec3 scale, glm::vec3 translate, unsigned stride);
 	~Model();
-	void draw(const Shader &shader) const;
+	virtual void draw(const Shader &shader) const;
 	virtual glm::mat4 get_model() const;
 };
 

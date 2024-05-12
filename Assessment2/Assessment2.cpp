@@ -30,6 +30,7 @@
 #include "BoatCamera.h"
 #include "LightCube.h"
 #include  "Terrain.h"
+#include "Grass.h"
 
 // no includes that use stb after stb_image_
 #define STB_IMAGE_IMPLEMENTATION
@@ -37,8 +38,8 @@
 
 #define NUM_POINT_LIGHTS 2
 #define NUM_SPOT_LIGHTS 2
-const int width = 1200;
-const int height = 800;
+const int width = 1920;
+const int height = 1080;
 unsigned int shadow_width = 2048;
 unsigned int shadow_height = 2048;
 
@@ -114,7 +115,8 @@ void render_shadow_map(Shader &shadow_shader, unsigned int shadow_map_fbo, std::
 	boat.draw(shadow_shader);
 }
 
-void render_scene(std::vector<std::unique_ptr<Model>> &models, const Camera *camera, Shader &shader, glm::mat4 &light_projection, unsigned int shadow_map, const Boat &boat) 
+void render_scene(std::vector<std::unique_ptr<Model>> &models, const Camera *camera, Shader &shader,
+	glm::mat4 &light_projection, unsigned int shadow_map, const Boat &boat, const Grass &grass, Shader &grass_shader) 
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, width, height);
@@ -139,6 +141,17 @@ void render_scene(std::vector<std::unique_ptr<Model>> &models, const Camera *cam
 	}
 
 	boat.draw(shader);
+
+	grass_shader.bind();
+	
+	glUniformMatrix4fv(grass_shader.get_uniform_location("light_projection"), 1, GL_FALSE, glm::value_ptr(light_projection));
+	glActiveTexture(GL_TEXTURE0 + 2);
+	glBindTexture(GL_TEXTURE_2D, shadow_map);
+	glUniform1i(grass_shader.get_uniform_location("shadow_map"), 2);
+
+	camera->bind(grass_shader, "cameraMat");
+
+	grass.draw(grass_shader);
 
 	glBindVertexArray(0);
 }
@@ -176,6 +189,7 @@ int main(int argc, char** argv)
 	Shader water_shader("water.vert", "textured.frag");
 	Shader skybox_shader("skybox.vert", "skybox.frag");
 	Shader light_cube_shader("light.vert", "light.frag");
+	Shader grass_shader("grass.vert", "textured.frag");
 
 	std::cout << "COMPILED SHADERS\n";
 
@@ -197,6 +211,10 @@ int main(int argc, char** argv)
 	models.push_back(std::make_unique<Plane>("objs/birb/birb.obj", glm::vec3(.1f, .1f, .1f), glm::vec3(00.f, 0.f, 00.f), Spline(control_points), 10, 270.0f));
 
 	models.push_back(std::make_unique<Terrain>(glm::vec3(2.0, 1.0, 2.0), glm::vec3(100.0, 20.0, 100.0), 200, 200));
+
+	//models.push_back(std::make_unique<Grass>(100, 100, glm::vec3(100.0, 100.0, 100.0), glm::vec3(100.0, 20.0, 100.0)200));
+
+	Grass grass = Grass(100, 100, glm::vec3(10.0, 10.0, 10.0), glm::vec3(100.0, 20.0, 100.0));
 
 	Water water = Water(400,400, glm::vec3(2.0,1.0,2.0), glm::vec3(-200,0,-200));
 
@@ -222,6 +240,7 @@ int main(int argc, char** argv)
 
 	point_lights[0].bind_at(0, "point_lights", shader);
 	point_lights[0].bind_at(0, "point_lights", water_shader);
+	point_lights[0].bind_at(0, "point_lights", grass_shader);
 
 	point_lights[1] = PointLight(
 		glm::vec3(-21.0f, 68.f, 65.f),
@@ -237,6 +256,7 @@ int main(int argc, char** argv)
 
 	point_lights[1].bind_at(1, "point_lights", shader);
 	point_lights[1].bind_at(1, "point_lights", water_shader);
+	point_lights[1].bind_at(1, "point_lights", grass_shader);
 
 	// set up spot lights
 	SpotLight spot_lights[NUM_SPOT_LIGHTS];
@@ -255,6 +275,7 @@ int main(int argc, char** argv)
 	spot_light_cubes.push_back(std::make_unique<LightCube>(glm::vec3(0, 60, 8), glm::vec3(1, 1, 1), glm::vec3(1.0,1.0,1.0)));
 	spot_lights[0].bind_at(0, "spot_lights", shader);
 	spot_lights[0].bind_at(0, "spot_lights", water_shader);
+	spot_lights[0].bind_at(0, "spot_lights", grass_shader);
 
 	spot_lights[1] = SpotLight(
 		glm::vec3(-3.0f, 94.f, 24.f),
@@ -269,6 +290,7 @@ int main(int argc, char** argv)
 	spot_light_cubes.push_back(std::make_unique<LightCube>(glm::vec3(-1, 60, -9), glm::vec3(1, 1, 1), glm::vec3(1.0,1.0,1.0)));
 	spot_lights[1].bind_at(1, "spot_lights", shader);
 	spot_lights[1].bind_at(1, "spot_lights", water_shader);
+	spot_lights[1].bind_at(1, "spot_lights", grass_shader);
 
 	DirectionalLight directional_light = DirectionalLight(glm::vec3(18,42.0f,21.1f),
 		glm::vec3(0.2f, 0.2f,0.2f),
@@ -277,6 +299,7 @@ int main(int argc, char** argv)
 
 	directional_light.bind(shader);
 	directional_light.bind(water_shader);
+	directional_light.bind(grass_shader);
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
@@ -286,8 +309,8 @@ int main(int argc, char** argv)
 	water_shader.bind();
 	glUniform3fv(water_shader.get_uniform_location("light_pos"), 1, glm::value_ptr(glm::vec3(100.1f, 100.0f, 100.1f)));
 	glUniform3fv(water_shader.get_uniform_location("light_col"), 1, glm::value_ptr(glm::vec3(1.0f, 1.0f, 1.0f)));
-	glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CCW);
+	//glEnable(GL_CULL_FACE);
+	//glFrontFace(GL_CCW);
 	
 	unsigned int shadow_map_fbo;
 	unsigned int shadow_map;
@@ -332,7 +355,6 @@ int main(int argc, char** argv)
 			glfwSetWindowTitle(window, title.c_str());
 			prev_time = curr_time;
 			count = 0;
-
 		}
 
 		processKeyboard(window, camera, normal_camera, boat_camera, is_normal, time_last_called);
@@ -341,7 +363,7 @@ int main(int argc, char** argv)
 
 		render_shadow_map(shadow_shader, shadow_map_fbo, models, boat);
 
-		render_scene(models, camera, shader, light_projection, shadow_map, boat);
+		render_scene(models, camera, shader, light_projection, shadow_map, boat, grass, grass_shader);
 
 
 		skybox.draw(skybox_shader, camera->get_camera_mat());

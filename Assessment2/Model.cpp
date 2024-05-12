@@ -198,7 +198,7 @@ Vertex m_create_vertex_from_indicies(const std::string &indicies, const std::vec
 
 	return Vertex(vec,tex, norm);
 }
-Model::Model(std::string filename, glm::vec3 scale, glm::vec3 translate)
+Model::Model(std::string filename, glm::vec3 scale, glm::vec3 translate, unsigned int stride)
 {
 	_model = glm::translate(glm::mat4(1.0f), translate);
 	_model = glm::scale(_model, scale);
@@ -259,7 +259,7 @@ Model::Model(std::string filename, glm::vec3 scale, glm::vec3 translate)
 				// if accessing a new object put previous object into list of objects
 				assert(curr_material_ref != -1);
 				std::cout << "created mesh with mtl : " << tokens.at(1) << std::endl;
-				_meshes.emplace_back(current_verticies, curr_material_ref);
+				_meshes.emplace_back(current_verticies, curr_material_ref, stride);
 				current_verticies.clear();
 			}
 
@@ -288,8 +288,11 @@ Model::Model(std::string filename, glm::vec3 scale, glm::vec3 translate)
 	assert(curr_material_ref != -1);
 
 	std::cout << "created mesh with mtl ref: " << curr_material_ref << std::endl;
-	_meshes.emplace_back(current_verticies, curr_material_ref);
+	_meshes.emplace_back(current_verticies, curr_material_ref, stride);
 }
+
+Model::Model(std::string filename, glm::vec3 scale, glm::vec3 translate) : Model(filename, scale, translate, 8)
+{}
 
 Model::~Model()
 {

@@ -1,14 +1,18 @@
 #pragma once
 #include "glm/glm.hpp"
 #include "Material.h"
+#include "Model.h"
+#include "Terrain.h"
+#include "glm/gtc/type_ptr.hpp"
 
-class Grass
+class Grass : public Model
 {
 public:
 	Grass(int height, int width, glm::vec3 scale, glm::vec3 translate);
+	void draw(const Shader &shader) const override;
+	glm::mat4 get_model() const override;
 private:
-	unsigned int _vao;
 	Material _mat;
-	unsigned int _vbo;
+	unsigned int _instances;
 };
 

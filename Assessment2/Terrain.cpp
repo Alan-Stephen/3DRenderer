@@ -34,7 +34,7 @@ Terrain::Terrain(glm::vec3 scale, glm::vec3 translate, int height, int width) :
         }
     }
 
-    _meshes.emplace_back(verts, 0);
+    _meshes.emplace_back(verts, 0, 8);
 }
 
 glm::vec2 Terrain::rand_grad(int ix, int iy) {

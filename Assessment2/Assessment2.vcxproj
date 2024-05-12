@@ -71,8 +71,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>../../include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>../../lib\glfw-3.3.8.bin.WIN64\lib-vc2022;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
+    <IncludePath>../include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>../lib\glfw-3.3.8.bin.WIN64\lib-vc2022;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>../../include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
@@ -140,7 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\include\GL\gl3w.c" />
+    <ClCompile Include="..\include\GL\gl3w.c" />
     <ClCompile Include="Assessment2.cpp" />
     <ClCompile Include="Boat.cpp" />
     <ClCompile Include="BoatCamera.cpp" />
@@ -185,6 +185,7 @@
     <ClInclude Include="Water.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="grass.vert" />
     <None Include="light.frag" />
     <None Include="light.vert" />
     <None Include="shadow.frag" />
