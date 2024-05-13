@@ -17,6 +17,15 @@ Grass::Grass(int height, int width, glm::vec3 scale, glm::vec3 translate) :
 	
 	for (int y = 0; y < height; y += 20) {
 		for (int x = 0; x < width; x += 20) {
+			glm::vec4 worldSpacePos = model * glm::vec4(x, 0, y, 1.0f);
+
+		    float distance = glm::distance(glm::vec2(worldSpacePos.x, worldSpacePos.z),glm::vec2(0, 0));
+
+			// don't create a tree if it will be in water.
+			if (distance < 220) {
+				continue;
+			}
+	
 
 			float random_x = -10 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (10 - (-2))));
 			float random_y = -10 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (10 - (-2))));

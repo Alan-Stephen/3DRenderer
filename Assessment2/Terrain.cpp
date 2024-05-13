@@ -1,4 +1,5 @@
 #include "Terrain.h"
+#include <iostream>
 
 Terrain::Terrain(glm::vec3 scale, glm::vec3 translate, int height, int width) :
     _height(height), _width(width)
@@ -10,11 +11,14 @@ Terrain::Terrain(glm::vec3 scale, glm::vec3 translate, int height, int width) :
 	Texture specular = Texture("objs/grass/normal.jpg", false, RGBA(255, 255, 255, 255));
 	Texture diffuse = Texture("objs/grass/grass.jpg", false, RGBA(150.0, 150.0, 150.0, 255.0));
 	_materials.emplace_back(ambient, specular, diffuse, 1, 1., "TERRAIN_MAT");
-    float repeat = 8;
+    float repeat = 4;
 
 
 	std::vector<Vertex> verts;
 
+    std::cout << "GENERATING TERRAIN\n";
+
+    float total = height * width;
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
                 float x1 = static_cast<float>(x);
@@ -31,8 +35,13 @@ Terrain::Terrain(glm::vec3 scale, glm::vec3 translate, int height, int width) :
                 verts.emplace_back(glm::vec3(x1, perlin(x1, z2, _model), z2), glm::vec2(x1 / repeat, z2 / repeat), perlin_norm(x1, z2));
                 verts.emplace_back(glm::vec3(x2, perlin(x2, z2, _model), z2), glm::vec2(x2 / repeat, z2 / repeat), perlin_norm(x2, z2));
                 verts.emplace_back(glm::vec3(x2, perlin(x2, z1, _model), z1), glm::vec2(x2 / repeat, z1 / repeat), perlin_norm(x2, z1));
+                if (y * x % 1000 == 0) {
+                    std::cout << "GENERATING TERRAIN : " << (static_cast<float>((x * y)) / total) * 100 << "%\n";
+                }
         }
     }
+
+    std::cout << "GENERATING TERRAIN DONE\n";
 
     _meshes.emplace_back(verts, 0, 8);
 }
@@ -83,8 +92,8 @@ float Terrain::perlin(float a, float b, glm::mat4 model)
     glm::vec4 worldSpacePos = model * glm::vec4(a, 0, b, 1.0f);
     
     // determine grid cell corner coordinates adding a large number as a hack to prevent x,y from being negative.
-    float x = static_cast<float>(worldSpacePos.x) / static_cast<float>(80) + 10000.0f;
-    float y = static_cast<float>(worldSpacePos.z) / static_cast<float>(80) + 10000.0f;
+    float x = static_cast<float>(worldSpacePos.x) / static_cast<float>(50) + 10000.0f;
+    float y = static_cast<float>(worldSpacePos.z) / static_cast<float>(50) + 10000.0f;
 
     int x0 = (int)x;
     int y0 = (int)y;
@@ -113,7 +122,7 @@ float Terrain::perlin(float a, float b, glm::mat4 model)
     
     float distance = glm::distance(glm::vec2(worldSpacePos.x, worldSpacePos.z),glm::vec2(0, 0));
     distance = max(200 - distance, -50);
-    return ((value * 45) - distance);
+    return ((value * 25) - distance);
 }
 
 // calculates normal of a vertex sampling perlin at point x,y

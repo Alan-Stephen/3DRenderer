@@ -93,8 +93,8 @@ void set_up_shadow_map(Shader &shadow_shader, Shader &grass_shadow_shader,  unsi
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	glm::mat4 orthogonal_projection = glm::ortho(-300.0f, 320.0f, -300.0f, 300.0f, 1.f, 1000.0f);
-	glm::mat4 light_view = glm::lookAt(400.f * glm::vec3(.18, 0.42, 0.22), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.0f, 0.f));
+	glm::mat4 orthogonal_projection = glm::ortho(-600.0f, 620.0f, -600.0f, 600.0f, 10.f, 1000.0f);
+	glm::mat4 light_view = glm::lookAt(800.f * glm::vec3(.18, 0.42, 0.22), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.0f, 0.f));
 	light_projection = orthogonal_projection * light_view;
 
 	shadow_shader.bind();
@@ -222,7 +222,7 @@ int main(int argc, char** argv)
 
 	//models.push_back(std::make_unique<Grass>(100, 100, glm::vec3(100.0, 100.0, 100.0), glm::vec3(100.0, 20.0, 100.0)200));
 
-	Grass grass = Grass(200, 200, glm::vec3(20.0, 20.0, 20.0), glm::vec3(-110.0, 18.0, -110.0));
+	Grass grass = Grass(780, 780, glm::vec3(20.0, 20.0, 20.0), glm::vec3(-390.0, 18.0, -390.0));
 
 	Water water = Water(400,400, glm::vec3(1.5,1.5,1.5), glm::vec3(-200,0,-200));
 
@@ -302,8 +302,8 @@ int main(int argc, char** argv)
 
 	DirectionalLight directional_light = DirectionalLight(glm::vec3(18,42.0f,21.1f),
 		glm::vec3(0.2f, 0.2f,0.2f),
-		glm::vec3(0.6, 0.6,0.6),
-		glm::vec3(.6f, .6f,.6));
+		glm::vec3(.5, .5,.5),
+		glm::vec3(.5f, .5f,.5));
 
 	directional_light.bind(shader);
 	directional_light.bind(water_shader);
