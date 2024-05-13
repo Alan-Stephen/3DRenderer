@@ -45,8 +45,8 @@ struct PointLight {
 	float quadratic;
 };
 
-#define NUM_POINT_LIGHTS 2
-#define NUM_SPOT_LIGHTS 2
+#define NUM_POINT_LIGHTS 3
+#define NUM_SPOT_LIGHTS 3
 uniform PointLight point_lights[NUM_POINT_LIGHTS];
 uniform SpotLight spot_lights[NUM_SPOT_LIGHTS];
 uniform DirectionalLight directional_light;
@@ -74,7 +74,7 @@ vec3 calculate_direct_light(DirectionalLight light, vec3 normal, vec3 view_direc
         float closest_depth;
         float current_depth = light_coords.z;
 
-        float bias = max(0.005 * (1 - dot(normal,lightDir)), 0.00005);
+        float bias = max(0.001 * (1 - dot(normal,lightDir)), 0.0021);
         int sampleRadius = 4;
 
 		vec2 pixelSize = 1.0 / textureSize(shadow_map, 0);

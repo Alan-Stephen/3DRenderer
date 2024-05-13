@@ -66,31 +66,33 @@ void Camera::handleInput(GLFWwindow* window)
 	}
 
 
-	// handle mouse inputs
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+		// handle mouse inputs
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
-	double mouse_x;
-	double mouse_y;
+		double mouse_x;
+		double mouse_y;
 
-	glfwGetCursorPos(window, &mouse_x, &mouse_y);
+		glfwGetCursorPos(window, &mouse_x, &mouse_y);
 
-	// normalize mouse coords  to center of screen
-	float rot_x = _sensitivity * (float)(mouse_y - (_height / 2)) / _height;
-	float rot_y = _sensitivity * (float)(mouse_x - (_width / 2)) / _width;
+		// normalize mouse coords  to center of screen
+		float rot_x = _sensitivity * (float)(mouse_y - (_height / 2)) / _height;
+		float rot_y = _sensitivity * (float)(mouse_x - (_width / 2)) / _width;
 
-	glm::vec3 new_orientation = glm::rotate(_orientation, glm::radians(-rot_x), glm::normalize(glm::cross(_orientation, _up)));
+		glm::vec3 new_orientation = glm::rotate(_orientation, glm::radians(-rot_x), glm::normalize(glm::cross(_orientation, _up)));
 
-	// prevents camera from flipping in on itself. 
-	if (abs(glm::angle(new_orientation, _up) - glm::radians(90.0f)) <= glm::radians(85.0f))
-	{
-		_orientation = new_orientation;
+		// prevents camera from flipping in on itself. 
+		if (abs(glm::angle(new_orientation, _up) - glm::radians(90.0f)) <= glm::radians(85.0f))
+		{
+			_orientation = new_orientation;
+		}
+
+		// rotates left and right
+		_orientation = glm::rotate(_orientation, glm::radians(-rot_y), _up);
+
+		// reset mouse position to the center
+		glfwSetCursorPos(window, (_width / 2), (_height / 2));
 	}
-
-	// rotates left and right
-	_orientation = glm::rotate(_orientation, glm::radians(-rot_y), _up);
-
-	// reset mouse position to the center
-	glfwSetCursorPos(window, (_width / 2), (_height / 2));
 }
 glm::vec3 Camera::get_pos() const
 {

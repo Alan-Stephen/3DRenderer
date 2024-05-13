@@ -36,8 +36,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-#define NUM_POINT_LIGHTS 2
-#define NUM_SPOT_LIGHTS 2
+#define NUM_POINT_LIGHTS 3
+#define NUM_SPOT_LIGHTS 3
 const int width = 1920;
 const int height = 1080;
 unsigned int shadow_width = 4048;
@@ -93,7 +93,7 @@ void set_up_shadow_map(Shader &shadow_shader, Shader &grass_shadow_shader,  unsi
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	glm::mat4 orthogonal_projection = glm::ortho(-600.0f, 620.0f, -600.0f, 600.0f, 10.f, 1000.0f);
+	glm::mat4 orthogonal_projection = glm::ortho(-600.0f, 620.0f, -600.0f, 600.0f, 10.f, 2000.0f);
 	glm::mat4 light_view = glm::lookAt(800.f * glm::vec3(.18, 0.42, 0.22), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.0f, 0.f));
 	light_projection = orthogonal_projection * light_view;
 
@@ -181,6 +181,7 @@ int main(int argc, char** argv)
 {
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );  
 	glfwInit();
+	glfwWindowHint(GLFW_SAMPLES, 4);
 	GLFWwindow* window = glfwCreateWindow(width, height, "Coursework", NULL, NULL);
 	glfwMakeContextCurrent(window);
 	glfwSetWindowSizeCallback(window, SizeCallback);
@@ -204,15 +205,16 @@ int main(int argc, char** argv)
 	std::cout << "PARSING OBJECTS\n";
 	std::vector<std::unique_ptr<Model>> models;
 
-	Boat boat = Boat("objs/Boat/boat.obj", glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-50.f, 0.f, 150.f));
+	Boat boat = Boat("objs/Boat/boat.obj", glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-50.f, 2.f, 150.f));
 	models.push_back(std::make_unique<Model>("objs/house/house.obj", glm::vec3(30.0f, 30.f, 30.f), glm::vec3(00.f, 45.f, 00.f)));
 	glm::mat4 model = glm::mat4(1.0f);
+	// contorl points have to be 10x normal due to some weird bug.
 	std::vector<glm::vec3> control_points = {
-		glm::vec3(4000,30,4000),
-		glm::vec3(-4000,30,4000),
-		glm::vec3(-4000,30,-4000),
-		glm::vec3(4000,30,-4000),
-		glm::vec3(4000,30,4000),
+		glm::vec3(1500,1000,1500),
+		glm::vec3(-1500,1000,1500),
+		glm::vec3(-1500,1000,-1500),
+		glm::vec3(1500,1000,-1500),
+		glm::vec3(1500,1000,1500),
 	};
 
 	// plane should loop every 10 seconds, rotate it 270.0f intially, otherwise it'll be facing the wrong direction
@@ -266,6 +268,24 @@ int main(int argc, char** argv)
 	point_lights[1].bind_at(1, "point_lights", water_shader);
 	point_lights[1].bind_at(1, "point_lights", grass_shader);
 
+
+
+	point_lights[2] = PointLight(
+		glm::vec3(-170.0f, 65.0f, 135.5f),
+		glm::vec3(1.0f, .1f, .1f),
+		glm::vec3(1.0f, .1f, .1f),
+		glm::vec3(0.f, 0.f, 0.f),
+		.01f,
+		.01f,
+		0.01f
+	);
+
+	point_light_cubes.push_back(std::make_unique<LightCube>(glm::vec3(-185.0f, 65.0f, 144.5f), glm::vec3(3.2,3.5,3.2), glm::vec3(1.0,.8,.8)));
+
+	point_lights[2].bind_at(2, "point_lights", shader);
+	point_lights[2].bind_at(2, "point_lights", water_shader);
+	point_lights[2].bind_at(2, "point_lights", grass_shader);
+
 	// set up spot lights
 	SpotLight spot_lights[NUM_SPOT_LIGHTS];
 	std::vector<std::unique_ptr<LightCube>> spot_light_cubes;
@@ -300,6 +320,22 @@ int main(int argc, char** argv)
 	spot_lights[1].bind_at(1, "spot_lights", water_shader);
 	spot_lights[1].bind_at(1, "spot_lights", grass_shader);
 
+
+	spot_lights[2] = SpotLight(
+		glm::vec3(-200.0f, 159.f, 101.f),
+		glm::vec3(0.0f, 1.f, 0.f),
+		glm::vec3(0.0f, 0.f, 0.f),
+		glm::vec3(1.0f, .0f,1.0f),
+		glm::vec3(1.0f, 1.f, 1.f),
+		0.98,
+		0.97
+	);
+
+	spot_light_cubes.push_back(std::make_unique<LightCube>(glm::vec3(-1, 60, -9), glm::vec3(1, 1, 1), glm::vec3(1.0,1.0,1.0)));
+	spot_lights[2].bind_at(2, "spot_lights", shader);
+	spot_lights[2].bind_at(2, "spot_lights", water_shader);
+	spot_lights[2].bind_at(2, "spot_lights", grass_shader);
+
 	DirectionalLight directional_light = DirectionalLight(glm::vec3(18,42.0f,21.1f),
 		glm::vec3(0.2f, 0.2f,0.2f),
 		glm::vec3(.5, .5,.5),
@@ -317,8 +353,10 @@ int main(int argc, char** argv)
 	water_shader.bind();
 	glUniform3fv(water_shader.get_uniform_location("light_pos"), 1, glm::value_ptr(glm::vec3(100.1f, 100.0f, 100.1f)));
 	glUniform3fv(water_shader.get_uniform_location("light_col"), 1, glm::value_ptr(glm::vec3(1.0f, 1.0f, 1.0f)));
-	//glEnable(GL_CULL_FACE);
-	//glFrontFace(GL_CCW);
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW); 
+	glEnable(GL_MULTISAMPLE);
+
 	
 	unsigned int shadow_map_fbo;
 	unsigned int shadow_map;
@@ -342,6 +380,11 @@ int main(int argc, char** argv)
 	double diff;
 	unsigned int count = 0;
 	double time_last_called = 0;
+	std::cout << "==================== INSTRUCTIONS ======================== \n"; 
+	std::cout << "hold the mouse button to pan camera around, release to free mouse\n";
+	std::cout << "Press E to switch to boat camera.Move around in boat camera in WASD.\n";
+	std::cout << "Press E to switch back to normal camera, WASD to movement and mouse to\n";
+	std::cout << "look around. if you see black initally it's probably because you're in an object.\n";
 	while (!glfwWindowShouldClose(window))
 	{
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -380,7 +423,11 @@ int main(int argc, char** argv)
 
 
 		// IMPORTANT : draw water after everything because it's transparent!!!
+		// not back face culling for water
+		glDisable(GL_CULL_FACE);
 		water.draw(water_shader, camera, light_projection, shadow_map);
+		glEnable(GL_CULL_FACE);
+		glFrontFace(GL_CCW); 
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
