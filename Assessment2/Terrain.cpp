@@ -10,7 +10,7 @@ Terrain::Terrain(glm::vec3 scale, glm::vec3 translate, int height, int width) :
 	Texture specular = Texture("objs/grass/normal.jpg", false, RGBA(255, 255, 255, 255));
 	Texture diffuse = Texture("objs/grass/grass.jpg", false, RGBA(150.0, 150.0, 150.0, 255.0));
 	_materials.emplace_back(ambient, specular, diffuse, 1, 1., "TERRAIN_MAT");
-    float repeat = 32;
+    float repeat = 8;
 
 
 	std::vector<Vertex> verts;
@@ -79,11 +79,12 @@ float Terrain::lerp(float start, float end, float t)
 
 float Terrain::perlin(float a, float b, glm::mat4 model)
 {
+    // a hack to prevent a and b from being negative.
     glm::vec4 worldSpacePos = model * glm::vec4(a, 0, b, 1.0f);
     
-    // determine grid cell corner coordinates
-    float x = static_cast<float>(worldSpacePos.x) / static_cast<float>(80);
-    float y = static_cast<float>(worldSpacePos.z) / static_cast<float>(80);
+    // determine grid cell corner coordinates adding a large number as a hack to prevent x,y from being negative.
+    float x = static_cast<float>(worldSpacePos.x) / static_cast<float>(80) + 10000.0f;
+    float y = static_cast<float>(worldSpacePos.z) / static_cast<float>(80) + 10000.0f;
 
     int x0 = (int)x;
     int y0 = (int)y;
@@ -109,7 +110,7 @@ float Terrain::perlin(float a, float b, glm::mat4 model)
     float value = lerp(ix0, ix1, sy);
 
     // increase the amplitude;
-    return value * 75;
+    return value * 45;
 }
 
 // calculates normal of a vertex sampling perlin at point x,y
