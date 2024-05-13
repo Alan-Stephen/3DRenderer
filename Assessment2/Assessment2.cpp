@@ -40,8 +40,8 @@
 #define NUM_SPOT_LIGHTS 2
 const int width = 1920;
 const int height = 1080;
-unsigned int shadow_width = 2048;
-unsigned int shadow_height = 2048;
+unsigned int shadow_width = 4048;
+unsigned int shadow_height = 4048;
 
 
 void SizeCallback(GLFWwindow* window, int w, int h)
@@ -93,8 +93,8 @@ void set_up_shadow_map(Shader &shadow_shader, unsigned int &shadow_map_fbo, unsi
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	glm::mat4 orthogonal_projection = glm::ortho(-300.0f, 120.0f, -300.0f, 100.0f, 0.1f, 1000.0f);
-	glm::mat4 light_view = glm::lookAt(400.f * glm::vec3(.18, 0.42, 0.22), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.0f, 0.f));
+	glm::mat4 orthogonal_projection = glm::ortho(-600.0f, 620.0f, -600.0f, 600.0f, 10.f, 4000.0f);
+	glm::mat4 light_view = glm::lookAt(700.f * glm::vec3(.18, 0.42, 0.22), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.0f, 0.f));
 	light_projection = orthogonal_projection * light_view;
 
 	shadow_shader.bind();
@@ -210,13 +210,13 @@ int main(int argc, char** argv)
 	// plane should loop every 10 seconds, rotate it 270.0f intially, otherwise it'll be facing the wrong direction
 	models.push_back(std::make_unique<Plane>("objs/birb/birb.obj", glm::vec3(.1f, .1f, .1f), glm::vec3(00.f, 0.f, 00.f), Spline(control_points), 10, 270.0f));
 
-	models.push_back(std::make_unique<Terrain>(glm::vec3(1.0, 1.0, 1.0), glm::vec3(300.0, 20.0, 300.0), 200, 200));
+	models.push_back(std::make_unique<Terrain>(glm::vec3(5.0, 1.0, 5.0), glm::vec3(300.0, 20.0, 300.0), 200, 200));
 
 	//models.push_back(std::make_unique<Grass>(100, 100, glm::vec3(100.0, 100.0, 100.0), glm::vec3(100.0, 20.0, 100.0)200));
 
-	Grass grass = Grass(200, 200, glm::vec3(10.0, 10.0, 10.0), glm::vec3(300.0, 23.0, 300.0));
+	Grass grass = Grass(200, 200, glm::vec3(20.0, 20.0, 20.0), glm::vec3(310.0, 20.0, 310.0));
 
-	Water water = Water(400,400, glm::vec3(2.0,1.0,2.0), glm::vec3(-200,0,-200));
+	Water water = Water(400,400, glm::vec3(.8,.8,.8), glm::vec3(-200,0,-200));
 
 	std::cout << "FINISHED PARSING\n";
 
@@ -228,8 +228,8 @@ int main(int argc, char** argv)
 
 	point_lights[0] = PointLight(
 		glm::vec3(21.0f, 65.f, 65.f),
-		glm::vec3(1.0f, .8f, .8f),
-		glm::vec3(.2f, .2f, .2f),
+		glm::vec3(1.0f, .1f, .1f),
+		glm::vec3(1.0f, .1f, .1f),
 		glm::vec3(0.f, 0.f, 0.f),
 		.001f,
 		.001f,
@@ -244,8 +244,8 @@ int main(int argc, char** argv)
 
 	point_lights[1] = PointLight(
 		glm::vec3(-21.0f, 68.f, 65.f),
-		glm::vec3(1.0f, .8f, .8f),
-		glm::vec3(0.2f, .2f, .2f),
+		glm::vec3(1.0f, .1f, .1f),
+		glm::vec3(1.0f, .1f, .1f),
 		glm::vec3(0.f, 0.f, 0.f),
 		.0001f,
 		.001f,

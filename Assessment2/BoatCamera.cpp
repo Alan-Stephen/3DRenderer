@@ -4,7 +4,7 @@
 BoatCamera::BoatCamera(int width, int height, glm::vec3 position, Boat &boat, float fov, float near_plane, float far_plane) : 
 	Camera(width, height, position, fov, near_plane, far_plane), _boat(boat)
 {
-	_speed = 0.5f;
+	_speed = 1.5f;
 }
 
 void BoatCamera::handleInput(GLFWwindow * window)
