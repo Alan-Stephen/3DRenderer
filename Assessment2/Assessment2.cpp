@@ -71,7 +71,7 @@ void processKeyboard(GLFWwindow* window, Camera *&camera, Camera &normal_camera,
 	}
 }
 
-void set_up_shadow_map(Shader &shadow_shader, unsigned int &shadow_map_fbo, unsigned int &shadow_map, glm::mat4 &light_projection) 
+void set_up_shadow_map(Shader &shadow_shader, Shader &grass_shadow_shader,  unsigned int &shadow_map_fbo, unsigned int &shadow_map, glm::mat4 &light_projection) 
 {
 	glGenFramebuffers(1, &shadow_map_fbo);
 
@@ -99,9 +99,13 @@ void set_up_shadow_map(Shader &shadow_shader, unsigned int &shadow_map_fbo, unsi
 
 	shadow_shader.bind();
 	glUniformMatrix4fv(shadow_shader.get_uniform_location("light_projection"), 1, GL_FALSE, glm::value_ptr(light_projection));
+
+	grass_shadow_shader.bind();
+	glUniformMatrix4fv(grass_shadow_shader.get_uniform_location("light_projection"), 1, GL_FALSE, glm::value_ptr(light_projection));
 }
 
-void render_shadow_map(Shader &shadow_shader, unsigned int shadow_map_fbo, std::vector<std::unique_ptr<Model>> &models, const Boat &boat) {
+void render_shadow_map(Shader &shadow_shader, unsigned int shadow_map_fbo, std::vector<std::unique_ptr<Model>> &models, const Boat &boat,
+	const Grass &grass, const Shader &grass_shader) {
 	shadow_shader.bind();
 	glEnable(GL_DEPTH_TEST);
 	glViewport(0, 0, shadow_width, shadow_height);
@@ -113,6 +117,9 @@ void render_shadow_map(Shader &shadow_shader, unsigned int shadow_map_fbo, std::
 	}	
 
 	boat.draw(shadow_shader);
+
+	// render with grass shadow shader.
+	grass.draw(grass_shader);
 }
 
 void render_scene(std::vector<std::unique_ptr<Model>> &models, const Camera *camera, Shader &shader,
@@ -190,6 +197,7 @@ int main(int argc, char** argv)
 	Shader skybox_shader("skybox.vert", "skybox.frag");
 	Shader light_cube_shader("light.vert", "light.frag");
 	Shader grass_shader("grass.vert", "textured.frag");
+	Shader grass_shadow_shader("grass_shadow.vert", "shadow.frag");
 
 	std::cout << "COMPILED SHADERS\n";
 
@@ -316,7 +324,7 @@ int main(int argc, char** argv)
 	unsigned int shadow_map;
 	glm::mat4 light_projection;
 	// enable shadows
-	set_up_shadow_map(shadow_shader, shadow_map_fbo, shadow_map, light_projection);
+	set_up_shadow_map(shadow_shader, grass_shadow_shader, shadow_map_fbo, shadow_map, light_projection);
 	
 	//Skybox::init(skybox_shader);
 	Skybox skybox = Skybox(skybox_shader);
@@ -361,7 +369,7 @@ int main(int argc, char** argv)
 
 		camera->handleInput(window);
 
-		render_shadow_map(shadow_shader, shadow_map_fbo, models, boat);
+		render_shadow_map(shadow_shader, shadow_map_fbo, models, boat, grass, grass_shadow_shader);
 
 		render_scene(models, camera, shader, light_projection, shadow_map, boat, grass, grass_shader);
 

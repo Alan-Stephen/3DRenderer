@@ -158,5 +158,6 @@
     <None Include="light.frag" />
     <None Include="light.vert" />
     <None Include="grass.vert" />
+    <None Include="grass_shadow.vert" />
   </ItemGroup>
 </Project>
