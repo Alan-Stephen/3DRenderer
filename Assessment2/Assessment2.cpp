@@ -93,8 +93,8 @@ void set_up_shadow_map(Shader &shadow_shader, Shader &grass_shadow_shader,  unsi
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	glm::mat4 orthogonal_projection = glm::ortho(-600.0f, 620.0f, -600.0f, 600.0f, 10.f, 4000.0f);
-	glm::mat4 light_view = glm::lookAt(700.f * glm::vec3(.18, 0.42, 0.22), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.0f, 0.f));
+	glm::mat4 orthogonal_projection = glm::ortho(-300.0f, 320.0f, -300.0f, 300.0f, 1.f, 1000.0f);
+	glm::mat4 light_view = glm::lookAt(400.f * glm::vec3(.18, 0.42, 0.22), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.0f, 0.f));
 	light_projection = orthogonal_projection * light_view;
 
 	shadow_shader.bind();
@@ -218,13 +218,13 @@ int main(int argc, char** argv)
 	// plane should loop every 10 seconds, rotate it 270.0f intially, otherwise it'll be facing the wrong direction
 	models.push_back(std::make_unique<Plane>("objs/birb/birb.obj", glm::vec3(.1f, .1f, .1f), glm::vec3(00.f, 0.f, 00.f), Spline(control_points), 10, 270.0f));
 
-	models.push_back(std::make_unique<Terrain>(glm::vec3(4.0, 1.0, 4.0), glm::vec3(-300.0, 20.0, -300.0), 400, 400));
+	models.push_back(std::make_unique<Terrain>(glm::vec3(4.0, 1.0, 4.0), glm::vec3(-400.0, 20.0, -400.0), 200, 200));
 
 	//models.push_back(std::make_unique<Grass>(100, 100, glm::vec3(100.0, 100.0, 100.0), glm::vec3(100.0, 20.0, 100.0)200));
 
-	Grass grass = Grass(200, 200, glm::vec3(20.0, 20.0, 20.0), glm::vec3(310.0, 20.0, 310.0));
+	Grass grass = Grass(200, 200, glm::vec3(20.0, 20.0, 20.0), glm::vec3(-110.0, 18.0, -110.0));
 
-	Water water = Water(400,400, glm::vec3(.8,.8,.8), glm::vec3(-200,0,-200));
+	Water water = Water(400,400, glm::vec3(1.5,1.5,1.5), glm::vec3(-200,0,-200));
 
 	std::cout << "FINISHED PARSING\n";
 

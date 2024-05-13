@@ -110,7 +110,10 @@ float Terrain::perlin(float a, float b, glm::mat4 model)
     float value = lerp(ix0, ix1, sy);
 
     // increase the amplitude;
-    return value * 45;
+    
+    float distance = glm::distance(glm::vec2(worldSpacePos.x, worldSpacePos.z),glm::vec2(0, 0));
+    distance = max(200 - distance, -50);
+    return ((value * 45) - distance);
 }
 
 // calculates normal of a vertex sampling perlin at point x,y
