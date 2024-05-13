@@ -210,11 +210,11 @@ int main(int argc, char** argv)
 	// plane should loop every 10 seconds, rotate it 270.0f intially, otherwise it'll be facing the wrong direction
 	models.push_back(std::make_unique<Plane>("objs/birb/birb.obj", glm::vec3(.1f, .1f, .1f), glm::vec3(00.f, 0.f, 00.f), Spline(control_points), 10, 270.0f));
 
-	models.push_back(std::make_unique<Terrain>(glm::vec3(2.0, 1.0, 2.0), glm::vec3(100.0, 20.0, 100.0), 200, 200));
+	models.push_back(std::make_unique<Terrain>(glm::vec3(1.0, 1.0, 1.0), glm::vec3(300.0, 20.0, 300.0), 200, 200));
 
 	//models.push_back(std::make_unique<Grass>(100, 100, glm::vec3(100.0, 100.0, 100.0), glm::vec3(100.0, 20.0, 100.0)200));
 
-	Grass grass = Grass(100, 100, glm::vec3(10.0, 10.0, 10.0), glm::vec3(100.0, 20.0, 100.0));
+	Grass grass = Grass(200, 200, glm::vec3(10.0, 10.0, 10.0), glm::vec3(300.0, 23.0, 300.0));
 
 	Water water = Water(400,400, glm::vec3(2.0,1.0,2.0), glm::vec3(-200,0,-200));
 
@@ -323,7 +323,7 @@ int main(int argc, char** argv)
 
 	shader.bind();
 
-	Camera normal_camera = Camera(width, height, glm::vec3(0.0, 0.0, 0.0), 45, 1, 1000);
+	Camera normal_camera = Camera(width, height, glm::vec3(0.0, 0.0, 0.0), 45, 5, 3000);
 	BoatCamera boat_camera = BoatCamera(width, height, glm::vec3(0.0, 0.0, 0.0), boat, 45, 1, 1000);
 
 	Camera* camera = &normal_camera;

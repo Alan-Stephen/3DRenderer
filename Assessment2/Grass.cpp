@@ -2,24 +2,28 @@
 
 Grass::Grass(int height, int width, glm::vec3 scale, glm::vec3 translate) :
 	// stride is 8 + 16 because normals + position + tex = 8 + num floats in model = 16
-	Model("objs/grass/grass_bill.obj", scale, translate,  8), _instances(height* width)
+	Model("objs/grass/grass_bill.obj", scale, translate,  8) 
 {
-	std::vector<glm::vec2> translates;
+	std::vector<glm::vec3> translates;
+	_instances = 0;
 
 	// generate grass model objects 
 
-	for (int x = 0; x < width; x++) {
-		for (int y = 0; y < height; y++) {
-			glm::mat4 model = glm::mat4(1.0f);
+	glm::mat4 model = glm::mat4(1.0f);
 
-			glm::vec2 ts = glm::vec2(x * 5, y*5);
-			model = glm::translate(model, translate + glm::vec3(x,0,y));
-			model = glm::scale(model, scale);
+	model = glm::translate(model, translate);
+	for (int y = 0; y < height; y += 3) {
+		for (int x = 0; x < width; x += 3) {
+
+			float random_x = -2 + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(2-(-2))));
+			float random_y = -2 + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(2-(-2))));
+			glm::vec3 ts = glm::vec3(x + random_x, 0.0f, y + random_y);
 
 			// this is to make sure the grass is on the same height as the terrain.
-			//ts.y = Terrain::perlin(x, y, model);
+			ts.y = Terrain::perlin(x, y, model);
 
 			translates.push_back(ts);
+			_instances += 1;
 		}
 	}
 
@@ -35,34 +39,13 @@ Grass::Grass(int height, int width, glm::vec3 scale, glm::vec3 translate) :
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
 	// bind grass transformation data to buffer
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * translates.size(), translates.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * translates.size(), translates.data(), GL_STATIC_DRAW);
 
-	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(3);
 
 	glBindVertexArray(vao);
 	glVertexAttribDivisor(3, 1);
-
-	/*
-	std::size_t vec4size = sizeof(glm::vec4);
-
-	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * vec4size , (void *)0);
-
-	glEnableVertexAttribArray(4);
-	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * vec4size, (void *)(1 * vec4size));
-
-	glEnableVertexAttribArray(5);
-	glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * vec4size, (void *)(2 * vec4size));
-
-	glEnableVertexAttribArray(6);
-	glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * vec4size, (void *)(3 * vec4size));
-
-	glVertexAttribDivisor(3, 1);
-	glVertexAttribDivisor(4, 1);
-	glVertexAttribDivisor(5, 1);
-	glVertexAttribDivisor(6, 1);
-	*/
 }
 
 void Grass::draw(const Shader& shader) const
