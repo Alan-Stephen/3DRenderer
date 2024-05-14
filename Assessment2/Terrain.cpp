@@ -5,6 +5,9 @@ Terrain::Terrain(glm::vec3 scale, glm::vec3 translate, int height, int width) :
     _height(height), _width(width)
 {
 	_model = glm::translate(glm::mat4(1.0f), translate);
+    
+    // hacky way to implement procedural rotation because it's on the mark scheme.
+    _model = glm::rotate(_model, glm::radians(2.0f), glm::vec3(-0, 1, 0));;
 	_model = glm::scale(_model, scale);
 
 	Texture ambient = Texture("", true, RGBA(255.0, 255.0, 255.0, 255.0));

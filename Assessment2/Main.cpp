@@ -223,7 +223,7 @@ int main(int argc, char** argv)
 
 	//models.push_back(std::make_unique<Grass>(100, 100, glm::vec3(100.0, 100.0, 100.0), glm::vec3(100.0, 20.0, 100.0)200));
 
-	Trees grass = Trees(780, 780, glm::vec3(20.0, 20.0, 20.0), glm::vec3(-390.0, 18.0, -390.0));
+	Trees grass = Trees(780, 780, glm::vec3(20.0, 20.0, 20.0), glm::vec3(-380.0, 18.0, -380.0));
 
 	Water water = Water(400,400, glm::vec3(1.5,1.5,1.5), glm::vec3(-200,0,-200));
 
