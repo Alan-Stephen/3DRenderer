@@ -79,6 +79,7 @@ void main()
         prev_x = wave.frequency * wave.direction.x * wave.amplitude * exp(sin(x) - 1) * cos_res;
         prev_y = wave.frequency * wave.direction.y * wave.amplitude * exp(sin(x) - 1) * cos_res;
 
+        // aggregate partial derivitives, a derivitive of a sum is sum of derivitives.
         ddx += prev_x;
         ddz += prev_y;
         
@@ -87,9 +88,12 @@ void main()
     }
 
     // it looks different to the formula in GPU gems because they use weird (x,z,y) format idk why
+    // the normal is calculated from cross product between normal and binormal but the formula below is equivalant. 
     norm = normalize(vec3(-ddx, 1, -ddz));
+
 	frag_pos_light = light_projection * vec4(pos, 1.0f);
     tex = aTex;
+
     // Transform the position to camera space and set gl_Position
     gl_Position = cameraMat * vec4(pos, 1f);
 }

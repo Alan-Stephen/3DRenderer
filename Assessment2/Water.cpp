@@ -29,15 +29,17 @@ Water::Water(unsigned int height, unsigned int width, glm::vec3 scale, glm::vec3
                 float x2 = x1 + 1.0f;
                 float z2 = z1 + 1.0f;
 
-                // Add the vertices of the first triangle of the quad
+
+                // first triangle of quad
                 _verts.push_back(x1); _verts.push_back(0.0f); _verts.push_back(z1); _verts.push_back(x1 / repeat); _verts.push_back(z1 / repeat);// Vertex 1
-                _verts.push_back(x1); _verts.push_back(0.0f); _verts.push_back(z2); _verts.push_back(x1 / repeat); _verts.push_back(z2 / repeat);// Vertex 1
-                _verts.push_back(x2); _verts.push_back(0.0f); _verts.push_back(z1); _verts.push_back(x2 / repeat); _verts.push_back(z1 / repeat);// Vertex 1
+                _verts.push_back(x1); _verts.push_back(0.0f); _verts.push_back(z2); _verts.push_back(x1 / repeat); _verts.push_back(z2 / repeat);// Vertex 2
+                _verts.push_back(x2); _verts.push_back(0.0f); _verts.push_back(z1); _verts.push_back(x2 / repeat); _verts.push_back(z1 / repeat);// Vertex 3
 
 
-                _verts.push_back(x1); _verts.push_back(0.0f); _verts.push_back(z2); _verts.push_back(x1 / repeat); _verts.push_back(z2 / repeat);// Vertex 1
-                _verts.push_back(x2); _verts.push_back(0.0f); _verts.push_back(z2); _verts.push_back(x2 / repeat); _verts.push_back(z2 / repeat);// Vertex 1
-                _verts.push_back(x2); _verts.push_back(0.0f); _verts.push_back(z1); _verts.push_back(x2 / repeat); _verts.push_back(z1 / repeat);// Vertex 1
+                // second triangle of quad.
+                _verts.push_back(x1); _verts.push_back(0.0f); _verts.push_back(z2); _verts.push_back(x1 / repeat); _verts.push_back(z2 / repeat);// Vertex 4
+                _verts.push_back(x2); _verts.push_back(0.0f); _verts.push_back(z2); _verts.push_back(x2 / repeat); _verts.push_back(z2 / repeat);// Vertex 5
+                _verts.push_back(x2); _verts.push_back(0.0f); _verts.push_back(z1); _verts.push_back(x2 / repeat); _verts.push_back(z1 / repeat);// Vertex 6
 
 
         }

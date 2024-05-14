@@ -8,6 +8,8 @@ Terrain::Terrain(glm::vec3 scale, glm::vec3 translate, int height, int width) :
 	_model = glm::scale(_model, scale);
 
 	Texture ambient = Texture("", true, RGBA(255.0, 255.0, 255.0, 255.0));
+
+    // load textures for terrain
 	Texture specular = Texture("objs/grass/normal.jpg", false, RGBA(255, 255, 255, 255));
 	Texture diffuse = Texture("objs/grass/grass.jpg", false, RGBA(150.0, 150.0, 150.0, 255.0));
 	_materials.emplace_back(ambient, specular, diffuse, 1, 1., "TERRAIN_MAT");

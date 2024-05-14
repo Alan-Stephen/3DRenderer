@@ -55,12 +55,12 @@ out vec4 fragColour;
 
 vec3 calculate_direct_light(DirectionalLight light, vec3 normal, vec3 view_direction)
 {
-    vec3 lightDir = normalize(light.direction);
+    vec3 light_dir = normalize(light.direction);
     // diffuse shading
-    float diff = max(dot(normal, lightDir), 0.0);
+    float diff = max(dot(normal, light_dir), 0.0);
     // specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(view_direction, reflectDir), 0.0), shininess); // shininess a bit too high thoguh
+    vec3 reflect_dir = reflect(-light_dir, normal);
+    float spec = pow(max(dot(view_direction, reflect_dir), 0.0), shininess); // shininess a bit too high thoguh
     // combine results
 
 
@@ -74,22 +74,22 @@ vec3 calculate_direct_light(DirectionalLight light, vec3 normal, vec3 view_direc
         float closest_depth;
         float current_depth = light_coords.z;
 
-        float bias = max(0.001 * (1 - dot(normal,lightDir)), 0.0021);
-        int sampleRadius = 4;
+        float bias = max(0.001 * (1 - dot(normal,light_dir)), 0.001);
+        int sample_radius = 4;
 
-		vec2 pixelSize = 1.0 / textureSize(shadow_map, 0);
-		for(int y = -sampleRadius; y <= sampleRadius; y++)
+		vec2 pixel_size = 1.0 / textureSize(shadow_map, 0);
+		for(int y = -sample_radius; y <= sample_radius; y++)
 		{
-		    for(int x = -sampleRadius; x <= sampleRadius; x++)
+		    for(int x = -sample_radius; x <= sample_radius; x++)
 		    {
-		        closest_depth = texture(shadow_map, light_coords.xy + vec2(x, y) * pixelSize).r;
+		        closest_depth = texture(shadow_map, light_coords.xy + vec2(x, y) * pixel_size).r;
 				if (current_depth > closest_depth + bias)
 					shadow += 1.0f;     
 		    }    
 		}
 
 		// Get average shadow
-		shadow /= pow((sampleRadius * 2 + 1), 2);
+		shadow /= pow((sample_radius * 2 + 1), 2);
     }
 
 	vec3 diffuse_res = vec3(texture(diffuse_tex, tex));
@@ -101,17 +101,17 @@ vec3 calculate_direct_light(DirectionalLight light, vec3 normal, vec3 view_direc
 
 vec3 calculate_spot_light(SpotLight light, vec3 normal, vec3 frag_position, vec3 view_direction) 
 {
-    vec3 lightDir = normalize(light.position - frag_position);
+    vec3 light_dir = normalize(light.position - frag_position);
     // diffuse shading
-    float diff = max(dot(normal, lightDir), 0.0);
+    float diff = max(dot(normal, light_dir), 0.0);
     // specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(view_direction, reflectDir), 0.0), shininess); // 16 is shininess
+    vec3 reflect_dir = reflect(-light_dir,normal);
+    float spec = pow(max(dot(view_direction, reflect_dir), 0.0), shininess); // 16 is shininess
     // attenuation
     float distance    = length(light.position - frag_position);
 
     // angle 
-    float angle = dot(vec3(0.0f,-1.0f, 0.0f), -lightDir);
+    float angle = dot(vec3(0.0f,-1.0f, 0.0f), -light_dir);
     float intensity = clamp((angle - light.outer_cutoff) / (light.cutoff - light.outer_cutoff), 0.0f, 1.0f);
 
 
@@ -124,12 +124,12 @@ vec3 calculate_spot_light(SpotLight light, vec3 normal, vec3 frag_position, vec3
 }
 
 vec3 calculate_point_light(PointLight light, vec3 normal, vec3 frag_position, vec3 view_direction) {
-    vec3 lightDir = normalize(light.position - frag_position);
+    vec3 light_dir = normalize(light.position - frag_position);
     // diffuse shading
-    float diff = max(dot(normal, lightDir), 0.0);
+    float diff = max(dot(normal, light_dir), 0.0);
     // specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(view_direction, reflectDir), 0.0), shininess); // 16 is shininess
+    vec3 reflect_dir = reflect(-light_dir, normal);
+    float spec = pow(max(dot(view_direction, reflect_dir), 0.0), shininess); // 16 is shininess
     // attenuation
     float distance    = length(light.position - frag_position);
     float attenuation = 1.0 / (light.constant + light.linear * distance + 
@@ -161,6 +161,7 @@ void main()
     vec3 normal = normalize(norm);
     vec3 view_direction = normalize(cam_pos - pos);
 	
+    // aggregate results from illuminating the scene from all lights using bling-phong lighting.
 	vec3 result = calculate_direct_light(directional_light, normal, view_direction); 
 	for(int i = 0; i < NUM_POINT_LIGHTS; i++) {
 		result += calculate_point_light(point_lights[i], normal,pos,view_direction);

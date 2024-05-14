@@ -140,8 +140,6 @@
     <None Include="shadow.vert" />
     <None Include="skybox.frag" />
     <None Include="skybox.vert" />
-    <None Include="test.frag" />
-    <None Include="water.frag" />
     <None Include="water.vert" />
     <None Include="light.frag" />
     <None Include="light.vert" />

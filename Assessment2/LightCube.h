@@ -8,6 +8,7 @@
 #include "glm/gtc/type_ptr.hpp"
 #include <iostream>
 
+// mean't to repersent a cube which is emitting light, such cubes won't cast cast shadows and will not be affected other lighting effects.
 class LightCube
 {
 public:

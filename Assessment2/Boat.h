@@ -5,7 +5,6 @@
 #include "glm/common.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include <vector>
-#define TAU 6.2831853f
 
 class Boat : public Model
 {
