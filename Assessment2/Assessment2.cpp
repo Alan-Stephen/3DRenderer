@@ -208,17 +208,17 @@ int main(int argc, char** argv)
 	Boat boat = Boat("objs/Boat/boat.obj", glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-50.f, 2.f, 150.f));
 	models.push_back(std::make_unique<Model>("objs/house/house.obj", glm::vec3(30.0f, 30.f, 30.f), glm::vec3(00.f, 45.f, 00.f)));
 	glm::mat4 model = glm::mat4(1.0f);
-	// contorl points have to be 10x normal due to some weird bug.
+
 	std::vector<glm::vec3> control_points = {
-		glm::vec3(1500,1000,1500),
-		glm::vec3(-1500,1000,1500),
-		glm::vec3(-1500,1000,-1500),
-		glm::vec3(1500,1000,-1500),
-		glm::vec3(1500,1000,1500),
+		glm::vec3(150,100,150),
+		glm::vec3(-150,100,150),
+		glm::vec3(-150,100,-150),
+		glm::vec3(150,100,-150),
+		glm::vec3(150,100,150),
 	};
 
-	// plane should loop every 10 seconds, rotate it 270.0f intially, otherwise it'll be facing the wrong direction
-	models.push_back(std::make_unique<Plane>("objs/birb/birb.obj", glm::vec3(.1f, .1f, .1f), glm::vec3(00.f, 0.f, 00.f), Spline(control_points), 10, 270.0f));
+	// plane should loop every 10 seconds, rotate it 180.0f intially, otherwise it'll be facing the wrong direction
+	models.push_back(std::make_unique<Plane>("objs/birb/Jet_Lowpoly.obj", glm::vec3(10.f, 10.f, 10.f), glm::vec3(00.f, 0.f, 00.f), Spline(control_points), 10, 180.0f));
 
 	models.push_back(std::make_unique<Terrain>(glm::vec3(4.0, 1.0, 4.0), glm::vec3(-400.0, 20.0, -400.0), 200, 200));
 

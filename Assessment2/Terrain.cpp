@@ -35,8 +35,8 @@ Terrain::Terrain(glm::vec3 scale, glm::vec3 translate, int height, int width) :
                 verts.emplace_back(glm::vec3(x1, perlin(x1, z2, _model), z2), glm::vec2(x1 / repeat, z2 / repeat), perlin_norm(x1, z2));
                 verts.emplace_back(glm::vec3(x2, perlin(x2, z2, _model), z2), glm::vec2(x2 / repeat, z2 / repeat), perlin_norm(x2, z2));
                 verts.emplace_back(glm::vec3(x2, perlin(x2, z1, _model), z1), glm::vec2(x2 / repeat, z1 / repeat), perlin_norm(x2, z1));
-                if (y * x % 1000 == 0) {
-                    std::cout << "GENERATING TERRAIN : " << (static_cast<float>((x * y)) / total) * 100 << "%\n";
+                if (((y * width) + x) % 100 == 0) {
+                    std::cout << "GENERATING TERRAIN : " << (static_cast<float>((x + (y * width))) / total) * 100 << "%\n";
                 }
         }
     }

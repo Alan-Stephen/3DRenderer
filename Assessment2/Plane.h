@@ -15,6 +15,7 @@ private:
 	Spline _spline;
 	int _repeat_interval_seconds;
 	float _initial_rotation_degrees;
+	glm::vec3 _scale;
 public:
 	Plane(std::string filename, glm::vec3 scale, glm::vec3 translate, Spline spline,
 		int repeat_interval_seconds, float initial_rotation_degrees);
