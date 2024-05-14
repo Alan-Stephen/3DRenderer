@@ -15,7 +15,6 @@
 #include "error.h"
 #include "Shader.h"
 
-#include "VertexBuffer.h"
 #include "Camera.h"
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
@@ -30,7 +29,7 @@
 #include "BoatCamera.h"
 #include "LightCube.h"
 #include  "Terrain.h"
-#include "Grass.h"
+#include "Trees.h"
 
 // no includes that use stb after stb_image_
 #define STB_IMAGE_IMPLEMENTATION
@@ -105,7 +104,7 @@ void set_up_shadow_map(Shader &shadow_shader, Shader &grass_shadow_shader,  unsi
 }
 
 void render_shadow_map(Shader &shadow_shader, unsigned int shadow_map_fbo, std::vector<std::unique_ptr<Model>> &models, const Boat &boat,
-	const Grass &grass, const Shader &grass_shader) {
+	const Trees &grass, const Shader &grass_shader) {
 	shadow_shader.bind();
 	glEnable(GL_DEPTH_TEST);
 	glViewport(0, 0, shadow_width, shadow_height);
@@ -123,7 +122,7 @@ void render_shadow_map(Shader &shadow_shader, unsigned int shadow_map_fbo, std::
 }
 
 void render_scene(std::vector<std::unique_ptr<Model>> &models, const Camera *camera, Shader &shader,
-	glm::mat4 &light_projection, unsigned int shadow_map, const Boat &boat, const Grass &grass, Shader &grass_shader) 
+	glm::mat4 &light_projection, unsigned int shadow_map, const Boat &boat, const Trees &grass, Shader &grass_shader) 
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, width, height);
@@ -224,7 +223,7 @@ int main(int argc, char** argv)
 
 	//models.push_back(std::make_unique<Grass>(100, 100, glm::vec3(100.0, 100.0, 100.0), glm::vec3(100.0, 20.0, 100.0)200));
 
-	Grass grass = Grass(780, 780, glm::vec3(20.0, 20.0, 20.0), glm::vec3(-390.0, 18.0, -390.0));
+	Trees grass = Trees(780, 780, glm::vec3(20.0, 20.0, 20.0), glm::vec3(-390.0, 18.0, -390.0));
 
 	Water water = Water(400,400, glm::vec3(1.5,1.5,1.5), glm::vec3(-200,0,-200));
 

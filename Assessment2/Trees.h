@@ -5,10 +5,10 @@
 #include "Terrain.h"
 #include "glm/gtc/type_ptr.hpp"
 
-class Grass : public Model
+class Trees : public Model
 {
 public:
-	Grass(int height, int width, glm::vec3 scale, glm::vec3 translate);
+	Trees(int height, int width, glm::vec3 scale, glm::vec3 translate);
 	void draw(const Shader &shader) const override;
 	glm::mat4 get_model() const override;
 private:

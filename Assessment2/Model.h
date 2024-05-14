@@ -1,8 +1,6 @@
 #pragma once
 #include <vector>
-#include "MaterialContainer.h"
 #include "Shader.h"
-#include "IndexBuffer.h"
 #include "glm/common.hpp"
 #include <vector>
 #include "Mesh.h"

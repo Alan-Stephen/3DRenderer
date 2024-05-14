@@ -145,8 +145,7 @@
     <ClCompile Include="Boat.cpp" />
     <ClCompile Include="BoatCamera.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Grass.cpp" />
-    <ClCompile Include="IndexBuffer.cpp" />
+    <ClCompile Include="Trees.cpp" />
     <ClCompile Include="LightCube.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
@@ -158,7 +157,6 @@
     <ClCompile Include="Spline.cpp" />
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="Texture.cpp" />
-    <ClCompile Include="VertexBuffer.cpp" />
     <ClCompile Include="Water.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -167,8 +165,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="error.h" />
     <ClInclude Include="file.h" />
-    <ClInclude Include="Grass.h" />
-    <ClInclude Include="IndexBuffer.h" />
+    <ClInclude Include="Trees.h" />
     <ClInclude Include="LightCube.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
@@ -181,7 +178,6 @@
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="Texture.h" />
-    <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="Water.h" />
   </ItemGroup>
   <ItemGroup>

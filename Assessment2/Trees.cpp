@@ -1,6 +1,6 @@
-#include "Grass.h"
+#include "Trees.h"
 
-Grass::Grass(int height, int width, glm::vec3 scale, glm::vec3 translate) :
+Trees::Trees(int height, int width, glm::vec3 scale, glm::vec3 translate) :
 	// stride is 8 + 16 because normals + position + tex = 8 + num floats in model = 16
 	Model("objs/tree/tree.obj", scale, translate,  8) 
 {
@@ -62,7 +62,7 @@ Grass::Grass(int height, int width, glm::vec3 scale, glm::vec3 translate) :
 	}
 }
 
-void Grass::draw(const Shader& shader) const
+void Trees::draw(const Shader& shader) const
 {
 	shader.bind();
 	glUniformMatrix4fv(shader.get_uniform_location("model"), 1, GL_FALSE, glm::value_ptr(get_model()));	
@@ -75,7 +75,7 @@ void Grass::draw(const Shader& shader) const
 	}
 }
 
-glm::mat4 Grass::get_model() const
+glm::mat4 Trees::get_model() const
 {
 	return _model;
 }
