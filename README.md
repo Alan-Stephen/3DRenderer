@@ -44,7 +44,7 @@ Here's an overview of all the feaures i implemented or utilised:
 - `Assessment2/objs/` - 3D models, textures, and other assets
 
 ## Acknowledgments
-
+Assets used:
 - Tree: https://www.turbosquid.com/3d-models/3d-low-poly-tree--game-ready-model-2141189-
 - House (modified by adding extra lamp): https://www.turbosquid.com/3d-models/house-in-the-sea-1412380 
 - Plane: https://www.turbosquid.com/3d-models/jet-lowpoly-3d-model-2068760
